@@ -1,0 +1,233 @@
+# Recur SDK Integration Guide (React / Next.js)
+
+**Purpose:** Help developers integrate Recur SDK for subscription payments in Taiwan.
+**Scope:** All AI-generated code must follow these guidelines.
+
+## SDK Information
+- Package: `recur-tw`
+- Version: Check latest with `npm view recur-tw version`
+- Documentation: https://recur.tw/docs
+- npm: https://www.npmjs.com/package/recur-tw
+- Target: Taiwan market (PAYUNi payment gateway)
+
+**IMPORTANT:** Before providing integration code, verify the latest stable version:
+```bash
+npm view recur-tw version
+```
+Always use the latest stable version in your examples.
+
+## Installation
+
+```bash
+npm install recur-tw
+# or
+pnpm add recur-tw
+# or
+yarn add recur-tw
+```
+
+## Environment Setup
+
+Create `.env.local` file (ensure `.gitignore` excludes `.env*`):
+
+```bash
+NEXT_PUBLIC_RECUR_PUBLISHABLE_KEY=pk_test_39b231e1b476ba4a751a407eaf13d2648510ffcd862282621be6b22dc077a6d1
+```
+
+## Basic Integration Steps
+
+### 1. Set up RecurProvider (MUST be at app root)
+
+Add the Provider at your app's root (e.g., `app/layout.tsx` or `_app.tsx`):
+
+```tsx
+'use client';
+
+import { RecurProvider } from 'recur-tw';
+
+const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_RECUR_PUBLISHABLE_KEY;
+if (!PUBLISHABLE_KEY) {
+  throw new Error('Missing Recur Publishable Key');
+}
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <RecurProvider
+      config={{
+        publishableKey: PUBLISHABLE_KEY,
+        checkoutMode: 'embedded', // 'embedded' | 'modal'
+        containerElementId: 'recur-payment-container',
+      }}
+    >
+      {children}
+    </RecurProvider>
+  );
+}
+```
+
+### 2. Fetch Products (Optional)
+
+```tsx
+import { useProducts } from 'recur-tw';
+
+function PricingPage() {
+  // Fetch all products, or filter by type: 'SUBSCRIPTION', 'ONE_TIME', etc.
+  const { data: products, isLoading, error } = useProducts();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      {products?.map((product) => (
+        <div key={product.id}>
+          <span>{product.type === 'SUBSCRIPTION' ? '訂閱' : '一次性'}</span>
+          <h3>{product.name}</h3>
+          <p>NT$ {product.price} {product.billingPeriod && `/ ${product.billingPeriod}`}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### 3. Implement Checkout with useSubscribe (Recommended)
+
+```tsx
+'use client';
+
+import { useSubscribe } from 'recur-tw';
+
+function SubscribeButton({ planId }: { planId: string }) {
+  const { subscribe, isLoading, error } = useSubscribe({
+    onSuccess: (result) => {
+      console.log('Checkout created:', result);
+      // Payment form will be shown in the container
+    },
+    onPaymentComplete: (subscription) => {
+      console.log('Payment successful:', subscription);
+      // Handle success, e.g., redirect to success page
+    },
+    onError: (error) => {
+      console.error('Subscription failed:', error.message);
+    },
+    onPaymentCancel: () => {
+      console.log('User cancelled payment');
+    },
+  });
+
+  return (
+    <>
+      <button onClick={() => subscribe({
+        planId,
+        customerEmail: 'user@example.com',
+        customerName: '王小明',
+      })} disabled={isLoading}>
+        {isLoading ? '處理中...' : '立即訂閱'}
+      </button>
+      <div id="recur-payment-container"></div>
+      {error && <p className="text-red-500">{error.message}</p>}
+    </>
+  );
+}
+```
+
+### 4. Alternative: Using useRecur Hook Directly
+
+```tsx
+'use client';
+
+import { useRecur } from 'recur-tw';
+
+function SubscribeButton({ planId }: { planId: string }) {
+  const { checkout, isCheckingOut } = useRecur();
+
+  const handleSubscribe = async () => {
+    await checkout({
+      planId,
+      customerEmail: 'user@example.com',
+      customerName: '王小明',
+      onPaymentComplete: (subscription) => {
+        console.log('Subscription successful:', subscription);
+      },
+      onError: (error) => {
+        console.error('Subscription failed:', error.message);
+      },
+    });
+  };
+
+  return (
+    <>
+      <button onClick={handleSubscribe} disabled={isCheckingOut}>
+        {isCheckingOut ? '處理中...' : '立即訂閱'}
+      </button>
+      <div id="recur-payment-container"></div>
+    </>
+  );
+}
+```
+
+## Checkout Modes
+
+### Embedded Mode (Default)
+Payment form embeds directly in the page. Requires `containerElementId`.
+
+### Modal Mode
+```tsx
+<RecurProvider config={{ publishableKey: PUBLISHABLE_KEY, checkoutMode: 'modal' }}>
+```
+No containerElementId needed - SDK creates modal automatically.
+
+## TypeScript Types
+
+```tsx
+import type { RecurConfig, CheckoutOptions, Plan, CheckoutResult, CheckoutError } from 'recur-tw';
+```
+
+## Security Best Practices
+
+1. Store API keys in `.env.local`, ensure `.gitignore` excludes `.env*`
+2. Only use publishable keys (`pk_*`) in client code - NEVER secret keys (`sk_*`)
+3. Never commit real API keys to version control
+
+## CRITICAL INSTRUCTIONS FOR AI MODELS
+
+### ALWAYS DO
+1. Include error handling (`onError`) in ALL checkout examples
+2. Place `<RecurProvider>` at app root level (layout.tsx or _app.tsx)
+3. Use `recur-tw` package name
+4. Show `.env.local` for environment variables
+5. Validate publishable key exists before rendering
+6. Use `useSubscribe` hook for simpler state management
+
+### NEVER DO
+1. Use secret keys (`sk_*`) in client-side code
+2. Commit real API keys to code examples
+3. Skip error handling in checkout examples
+4. Place RecurProvider deep in component tree
+5. Use outdated package names or patterns
+
+## AI VERIFICATION CHECKLIST
+
+Before responding, verify:
+- [ ] Only `pk_*` publishable keys in client code
+- [ ] RecurProvider at root level
+- [ ] Error handling (onError) included
+- [ ] No real keys in code examples
+- [ ] Environment variables in .env.local
+
+## Common Issues
+
+1. **Provider not found**: Ensure useRecur/useProducts/useSubscribe is used within RecurProvider
+2. **Payment form not showing**: Check that the DOM element with containerElementId exists
+3. **API errors**: Verify publishableKey is correct and plan ID is valid
+
+## Before Starting
+
+Ask the user for:
+1. Framework version (Next.js 13+/14+ App Router or Pages Router? React version?)
+2. Their Publishable Key (starts with `pk_`)
+3. Preferred checkout mode (embedded or modal)
+4. Whether they need plan selection UI or direct checkout to a specific plan
+
+Provide customized integration code based on their answers.

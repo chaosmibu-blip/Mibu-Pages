@@ -1,0 +1,133 @@
+請建立商家合作介紹頁 /for-business
+頁面目的：
+- 向商家介紹 Mibu 平台的合作價值
+- 引導商家查看訂閱方案或登入
+頁面結構：
+1. Hero Section
+   - 標題：「讓更多旅客發現您的店家」
+   - 副標題：「加入 Mibu，提升曝光、吸引客流」
+   - CTA 按鈕：「查看訂閱方案」→ /for-business/pricing
+2. 功能亮點區（3-4 個卡片）
+   - 曝光提升：出現在扭蛋推薦中
+   - 優惠券發放：吸引旅客到店消費
+   - 數據分析：了解客流與曝光數據
+   - 專屬標記：認領店家顯示「已認領」標籤
+3. 訂閱方案預覽（簡化版）
+   - 免費 / Pro / Premium 三欄
+   - 底部 CTA：「查看完整方案」→ /for-business/pricing
+4. 已登入商家 CTA
+   - 「已經是商家？」→ /merchant/login
+注意：此頁為公開頁面，無需認證
+指令 2：訂閱方案頁 /for-business/pricing
+請建立訂閱方案頁 /for-business/pricing
+API 依賴：
+GET /api/subscription-plans
+→ 回傳 { plans: SubscriptionPlan[] }
+頁面結構：
+1. 標題區
+   - 「選擇適合您的方案」
+   - 年付/月付切換器（Tab 或 Toggle）
+2. 方案卡片區（PricingCard 元件）
+   每張卡片顯示：
+   - 方案名稱（免費 / Pro 專業版 / Premium 旗艦版）
+   - 月付價格 / 年付價格
+   - 功能列表（features 陣列）
+   - 推薦標籤（highlighted: true 時顯示）
+   - CTA 按鈕：
+     - 免費：「開始使用」→ 下載 App
+     - Pro/Premium：「立即訂閱」→ 結帳流程
+3. 結帳流程（已登入商家）
+   - 選擇金流：Stripe / Recur
+   - POST /api/merchant/subscription/checkout
+   - Stripe → window.location.href = res.url
+   - Recur → RecurCheckout.redirectToCheckout(...)
+4. 未登入處理
+   - 點擊訂閱按鈕 → 跳轉 /merchant/login?redirect=/for-business/pricing
+TypeScript 類型：
+interface SubscriptionPlan {
+  tier: 'free' | 'pro' | 'premium';
+  name: string;
+  priceMonthly: number;
+  priceYearly: number | null;
+  features: string[];
+  highlighted: boolean;
+  highlightLabel: string | null;
+}
+指令 3：商家登入頁 /merchant/login
+請建立商家登入頁 /merchant/login
+API 依賴：
+POST /api/auth/login
+Body: { email, password, target_role: 'merchant' }
+Response: { token, user }
+頁面結構：
+1. 左側品牌區（桌機顯示 lg:flex）
+   - 背景色：primary
+   - 標題：「Mibu 商家平台」
+   - 副標題：「管理訂閱，查看權限」
+2. 右側登入表單
+   - Email 輸入框
+   - 密碼輸入框
+   - 登入按鈕（loading 狀態）
+   - 錯誤訊息顯示區
+3. 無帳號引導區
+   - 「還沒有商家帳號？」
+   - 「請下載 App 完成商家註冊」
+   - 下載按鈕：iOS + Android
+錯誤處理：
+| code | 顯示訊息 |
+|------|---------|
+| INVALID_CREDENTIALS | 帳號或密碼錯誤 |
+| PENDING_APPROVAL | 帳號審核中，請等待管理員核准 |
+| ROLE_MISMATCH | 此帳號不是商家帳號，請使用 App 登入 |
+登入成功後：
+- Cookie 由後端自動設定（credentials: 'include'）
+- 跳轉至 /merchant/dashboard 或 query.redirect
+注意：此頁為公開頁面，已登入則跳轉 dashboard
+指令 4：商家後台 /merchant/dashboard
+請建立商家後台頁 /merchant/dashboard
+API 依賴：
+GET /api/merchant/subscription
+Response: { subscription: MerchantSubscription }
+頁面結構：
+1. 頁面標題：「商家後台」
+2. 訂閱狀態卡片
+   - 當前方案：免費方案 / Pro 專業版 / Premium 旗艦版
+   - 狀態標籤：
+     - active：綠色「有效」
+     - past_due：黃色「付款逾期」
+     - cancelled：紅色「已取消」
+   - 到期日：YYYY/MM/DD 格式
+   - 若為 free → 顯示「升級方案」按鈕
+3. 功能說明區
+   - 「商家認領、數據報表等功能請使用 App」
+   - 下載按鈕：iOS + Android
+認證保護：
+- 使用 middleware.ts 或 useEffect 檢查登入狀態
+- 未登入 → 跳轉 /merchant/login
+TypeScript 類型：
+interface MerchantSubscription {
+  tier: 'free' | 'pro' | 'premium';
+  status: 'active' | 'past_due' | 'cancelled' | 'trialing';
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+}
+重要：此頁為唯讀，僅顯示訂閱狀態。商家管理功能（認領、優惠券、數據）僅在 App 中提供。
+共用元件需求
+請確保以下元件已建立：
+1. DownloadButton（components/common/DownloadButton.tsx）
+   - platform: 'ios' | 'android'
+   - Android：Toast 顯示「敬請期待」
+   - iOS：跳轉 App Store（待補連結）
+2. PricingCard（components/pricing/PricingCard.tsx）
+   - 接收 SubscriptionPlan
+   - 顯示方案資訊與 CTA
+3. API Client（lib/api/client.ts）
+   - 統一 fetch 封裝
+   - credentials: 'include'（Cookie 自動帶入）
+   - 錯誤處理：ApiError class
+4. middleware.ts
+   - 保護 /merchant/* 路由
+   - 檢查 auth_token cookie
+後端 API URL：
+
+開發：https://591965a7-25f6-479c-b527-3890b1193c21-00-1m08cwv9a4rev.picard.replit.dev
