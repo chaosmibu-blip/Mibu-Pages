@@ -23,11 +23,20 @@ export const metadata: Metadata = {
     siteName: "Mibu",
     locale: "zh_TW",
     type: "website",
+    images: [
+      {
+        url: "https://mibu-travel.com/icon.jpg",
+        width: 512,
+        height: 512,
+        alt: "Mibu - 旅遊扭蛋",
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Mibu - 旅遊扭蛋",
     description: "用旅遊扭蛋的方式探索世界，發現隱藏的好去處。",
+    images: ["https://mibu-travel.com/icon.jpg"],
   },
   robots: {
     index: true,

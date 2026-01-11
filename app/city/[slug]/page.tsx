@@ -94,6 +94,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${city.name}景點推薦 | Mibu 旅遊扭蛋`,
       description: city.description,
+      images: [{ url: "https://mibu-travel.com/icon.jpg" }],
     },
   };
 }

@@ -98,6 +98,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     openGraph: {
       title: `${place.name} - ${place.cityName}景點`,
       description: place.description,
+      images: [{ url: "https://mibu-travel.com/icon.jpg" }],
     },
   };
 }
