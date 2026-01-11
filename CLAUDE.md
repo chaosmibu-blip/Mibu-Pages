@@ -130,6 +130,13 @@ shared/
 | 取消訂閱 | 在訂閱管理頁面點擊取消，服務持續至當期結束 |
 | 申請退款 | 首次付款 7 天內可申請，符合消保法規定 |
 
+## 金流串接
+
+| 金流商 | 串接方式 |
+|--------|----------|
+| **Stripe** | Checkout Session |
+| **Recur** | SDK `redirectToCheckout` |
+
 ## 下載按鈕規格
 
 - **iOS**：跳轉 App Store
@@ -174,3 +181,13 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 
 - **正式網域**: `https://mibu-travel.com`
 - **Sitemap**: `https://mibu-travel.com/sitemap.xml`
+
+## 專案特性
+
+| 項目 | 說明 |
+|------|------|
+| **複雜度** | 中（UI、SEO、金流串接） |
+| **獨立性** | 依賴後端 API |
+| **部署** | Replit Publish |
+
+官網相對單純，主要是 UI 實作和 API 串接，熟悉 Next.js 即可快速上手。
