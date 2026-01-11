@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 溝通風格
+
+- 用口語化的繁體中文
+- 像朋友聊天一樣解釋
+- 專有名詞要順便說明白話意思
+- 修改前先說「我想做什麼」和「為什麼」
+
 ## Project Overview
 
 **Mibu-Pages 是 Mibu 旅遊扭蛋 App 的官方網站**，不是 App 本身。
