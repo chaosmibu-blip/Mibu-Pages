@@ -5,3 +5,9 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Claude Code
+.claude/
+
+# TypeScript cache
+tsconfig.tsbuildinfo
