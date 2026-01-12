@@ -11,16 +11,27 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Store, CreditCard, MapPin, Ticket, LogOut, ArrowRight, AlertTriangle, CheckCircle, PartyPopper } from "lucide-react";
+import {
+  Store, CreditCard, MapPin, Ticket, LogOut, ArrowRight, AlertTriangle,
+  CheckCircle, PartyPopper, ExternalLink, HelpCircle, CalendarDays,
+  ArrowUpRight, RefreshCw, Clock
+} from "lucide-react";
 import { RefundRequestDialog } from "@/components/common/RefundRequestDialog";
 import { API_URL } from "@/lib/config";
 
-const tierLabels: Record<string, { name: string; color: string }> = {
-  free: { name: "免費方案", color: "bg-muted text-muted-foreground" },
-  basic: { name: "基礎方案", color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
-  pro: { name: "專業方案", color: "bg-primary/10 text-primary" },
-  premium: { name: "旗艦方案", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300" },
-  partner: { name: "合作夥伴", color: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" },
+const tierLabels: Record<string, { name: string; color: string; description: string }> = {
+  free: { name: "免費方案", color: "bg-muted text-muted-foreground", description: "基礎功能，適合新手試用" },
+  basic: { name: "基礎方案", color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300", description: "小型商家適用" },
+  pro: { name: "專業方案", color: "bg-primary/10 text-primary", description: "進階功能，優先曝光" },
+  premium: { name: "旗艦方案", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300", description: "完整功能，專屬客服" },
+  partner: { name: "合作夥伴", color: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300", description: "策略合作夥伴專屬" },
+};
+
+const statusLabels: Record<string, { name: string; color: string; icon: typeof CheckCircle }> = {
+  active: { name: "使用中", color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300", icon: CheckCircle },
+  cancelled: { name: "已取消", color: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300", icon: Clock },
+  past_due: { name: "付款逾期", color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300", icon: AlertTriangle },
+  trialing: { name: "試用中", color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300", icon: RefreshCw },
 };
 
 function SubscriptionContent() {
@@ -131,20 +142,39 @@ function SubscriptionContent() {
               </div>
             ) : merchant ? (
               <>
+                {/* 方案資訊卡片 */}
                 <div className="p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl">
-                  <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">目前方案</p>
-                      <Badge className={tierInfo.color}>{tierInfo.name}</Badge>
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">目前方案</p>
+                      <div className="flex items-center gap-2">
+                        <Badge className={tierInfo.color}>{tierInfo.name}</Badge>
+                        {subscription?.status && statusLabels[subscription.status] && (
+                          <Badge className={statusLabels[subscription.status].color}>
+                            {statusLabels[subscription.status].name}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{tierInfo.description}</p>
                     </div>
-                    <div className="flex items-center gap-2 text-primary">
-                      <CreditCard className="h-5 w-5" />
+                    <div className="p-3 bg-background/50 rounded-lg">
+                      <CreditCard className="h-6 w-6 text-primary" />
                     </div>
                   </div>
-                  {merchant.merchantLevelExpiresAt && (
-                    <p className="text-sm text-muted-foreground mt-3">
-                      到期日：{new Date(merchant.merchantLevelExpiresAt).toLocaleDateString("zh-TW")}
-                    </p>
+
+                  {/* 日期資訊 */}
+                  {(merchant.merchantLevelExpiresAt || subscription?.currentPeriodEnd) && (
+                    <div className="flex items-center gap-2 mt-4 pt-4 border-t border-primary/10">
+                      <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {subscription?.status === "cancelled" ? "服務至：" : "下次續訂："}
+                        {new Date(merchant.merchantLevelExpiresAt || subscription?.currentPeriodEnd).toLocaleDateString("zh-TW", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
                   )}
                 </div>
 
@@ -169,67 +199,141 @@ function SubscriptionContent() {
                   </div>
                 </div>
 
+                {/* 免費方案升級提示 */}
                 {(merchant.merchantLevel === "free" || !merchant.merchantLevel) && (
-                  <Link href="/for-business/pricing" className="block">
-                    <Button className="w-full" data-testid="button-upgrade">
-                      升級方案
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                )}
-
-                {isPaidPlan && (
-                  <div className="p-4 border rounded-lg space-y-4">
-                    <h4 className="font-medium text-foreground flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      訂閱設定
-                    </h4>
-                    
-                    {cancelMutation.data?.success && (
-                      <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <AlertDescription className="text-green-700 dark:text-green-300">
-                          {cancelMutation.data.message || "訂閱已取消，將在當期結束後停止"}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                    
-                    {cancelMutation.isError && (
-                      <Alert variant="destructive">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertDescription>
-                          取消訂閱失敗，請稍後再試
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    <div className="flex flex-wrap gap-3">
-                      <RefundRequestDialog subscriptionId={subscription?.id} />
-                      
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (subscription?.id && confirm("確定要取消訂閱嗎？取消後服務將持續到當期結束。")) {
-                            cancelMutation.mutate(subscription.id);
-                          }
-                        }}
-                        disabled={cancelMutation.isPending}
-                        data-testid="button-cancel-subscription"
-                      >
-                        {cancelMutation.isPending ? "處理中..." : "取消訂閱"}
-                      </Button>
+                  <div className="p-4 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
+                    <div className="flex items-start gap-3">
+                      <ArrowUpRight className="h-5 w-5 text-primary mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-foreground">升級解鎖更多功能</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          升級至專業方案，獲得優先曝光、進階報表等功能
+                        </p>
+                        <Link href="/for-business/pricing" className="inline-block mt-3">
+                          <Button data-testid="button-upgrade">
+                            查看方案
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
-                    
-                    <p className="text-xs text-muted-foreground">
-                      取消後服務持續至當期結束。如需退款，請在首次付款後 7 天內申請。
-                      <Link href="/refund" className="text-primary hover:underline ml-1">
-                        查看退款政策
-                      </Link>
-                    </p>
                   </div>
                 )}
 
-                <div className="pt-6 border-t text-center">
+                {/* 付費方案管理區塊 */}
+                {isPaidPlan && (
+                  <div className="space-y-4">
+                    {/* 快捷操作 */}
+                    <div className="flex flex-wrap gap-3">
+                      <Link href="/for-business/pricing">
+                        <Button variant="outline">
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          變更方案
+                        </Button>
+                      </Link>
+                      {subscription?.billingPortalUrl && (
+                        <Button
+                          variant="outline"
+                          onClick={() => window.open(subscription.billingPortalUrl, "_blank")}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          管理帳單
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* 訂閱設定 */}
+                    <div className="p-4 border rounded-lg space-y-4">
+                      <h4 className="font-medium text-foreground flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        訂閱設定
+                      </h4>
+
+                      {cancelMutation.data?.success && (
+                        <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <AlertDescription className="text-green-700 dark:text-green-300">
+                            {cancelMutation.data.message || "訂閱已取消，將在當期結束後停止"}
+                          </AlertDescription>
+                        </Alert>
+                      )}
+
+                      {cancelMutation.isError && (
+                        <Alert variant="destructive">
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertDescription>
+                            取消訂閱失敗，請稍後再試
+                          </AlertDescription>
+                        </Alert>
+                      )}
+
+                      <div className="flex flex-wrap gap-3">
+                        <RefundRequestDialog subscriptionId={subscription?.id} />
+
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            if (subscription?.id && confirm("確定要取消訂閱嗎？取消後服務將持續到當期結束。")) {
+                              cancelMutation.mutate(subscription.id);
+                            }
+                          }}
+                          disabled={cancelMutation.isPending || subscription?.status === "cancelled"}
+                          data-testid="button-cancel-subscription"
+                        >
+                          {cancelMutation.isPending ? "處理中..." : "取消訂閱"}
+                        </Button>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground">
+                        取消後服務持續至當期結束。如需退款，請在首次付款後 7 天內申請。
+                        <Link href="/refund" className="text-primary hover:underline ml-1">
+                          查看退款政策
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* 常見問題 */}
+                <div className="pt-6 border-t">
+                  <div className="flex items-center gap-2 mb-4">
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    <h4 className="font-medium text-foreground">常見問題</h4>
+                  </div>
+                  <div className="space-y-3 text-sm">
+                    <details className="group">
+                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                        如何變更付款方式？
+                      </summary>
+                      <p className="mt-2 text-muted-foreground pl-4">
+                        請點擊「管理帳單」進入帳單管理頁面，即可更新信用卡或付款資訊。
+                      </p>
+                    </details>
+                    <details className="group">
+                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                        取消訂閱後會怎樣？
+                      </summary>
+                      <p className="mt-2 text-muted-foreground pl-4">
+                        取消訂閱後，您的服務會持續到當期結束。之後帳號會降級為免費方案。
+                      </p>
+                    </details>
+                    <details className="group">
+                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                        可以申請退款嗎？
+                      </summary>
+                      <p className="mt-2 text-muted-foreground pl-4">
+                        首次訂閱後 7 天內可申請全額退款。詳情請參閱
+                        <Link href="/refund" className="text-primary hover:underline ml-1">
+                          退款政策
+                        </Link>
+                        。
+                      </p>
+                    </details>
+                  </div>
+                </div>
+
+                {/* App 引導 */}
+                <div className="pt-4 text-center">
                   <p className="text-sm text-muted-foreground">
                     如需管理店家或優惠券，請使用 Mibu App
                   </p>
