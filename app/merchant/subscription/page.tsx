@@ -11,8 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Store, CreditCard, MapPin, Ticket, LogOut, ArrowRight, AlertTriangle, CheckCircle } from "lucide-react";
 import { RefundRequestDialog } from "@/components/common/RefundRequestDialog";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+import { API_URL } from "@/lib/config";
 
 const tierLabels: Record<string, { name: string; color: string }> = {
   free: { name: "免費方案", color: "bg-muted text-muted-foreground" },

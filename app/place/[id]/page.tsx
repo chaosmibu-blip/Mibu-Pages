@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AppDownloadCTA } from "@/components/common/AppDownloadCTA";
 import { MapPin, Star, Clock, Phone, Globe, ArrowLeft, ExternalLink } from "lucide-react";
+import { API_URL } from "@/lib/config";
 
 interface PlaceData {
   id: string;
@@ -23,8 +24,6 @@ interface PlaceData {
   citySlug: string;
   cityName: string;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://591965a7-25f6-479c-b527-3890b1193c21-00-1m08cwv9a4rev.picard.replit.dev";
 
 async function getPlace(id: string): Promise<PlaceData | null> {
   try {

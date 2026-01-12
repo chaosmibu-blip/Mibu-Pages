@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { API_URL } from '@/lib/config';
 
 interface RefundRequestInput {
   subscriptionId: number;
@@ -17,8 +18,7 @@ interface RefundResponse {
 
 export function useRefundRequest() {
   const queryClient = useQueryClient();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-  
+
   return useMutation<RefundResponse, Error, RefundRequestInput>({
     mutationFn: async (data) => {
       const res = await fetch(

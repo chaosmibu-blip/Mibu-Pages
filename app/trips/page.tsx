@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Route } from "lucide-react";
+import { API_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "探索行程 | Mibu",
@@ -24,8 +25,6 @@ interface City {
   name: string;
   tripCount: number;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://591965a7-25f6-479c-b527-3890b1193c21-00-1m08cwv9a4rev.picard.replit.dev";
 
 async function getTrips(): Promise<Trip[]> {
   try {
