@@ -107,27 +107,30 @@ function SubscribeContent() {
       if (provider === "recur") {
         const customerEmail = user?.email || "test@example.com";
         const customerName = "Customer";
-        
+
         console.log("Recur checkout params:", {
           planId: data.productId,
           customerEmail,
           customerName,
         });
-        
+
+        // Recur checkout 會開啟 modal，在 callbacks 中處理 loading 狀態
         await checkout({
           planId: data.productId,
           customerEmail,
           customerName,
-          onPaymentComplete: (subscription: any) => {
+          onPaymentComplete: (subscription: unknown) => {
             console.log("訂閱成功:", subscription);
+            setIsLoading(false);
             toast({
               title: "訂閱成功",
-              description: "感謝您的訂閱！",
+              description: "感謝您的訂閱！正在跳轉...",
             });
             router.push("/merchant/subscription?success=true");
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             console.error("訂閱失敗:", error.message);
+            setIsLoading(false);
             toast({
               title: "結帳失敗",
               description: error.message || "請稍後再試",
@@ -135,6 +138,8 @@ function SubscribeContent() {
             });
           },
         });
+        // Recur checkout 開啟 modal 後 return，不執行 finally 的 setIsLoading(false)
+        return;
       } else {
         const checkoutUrl = data.url || data.checkoutUrl;
         if (checkoutUrl) {

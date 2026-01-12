@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,8 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Store, CreditCard, MapPin, Ticket, LogOut, ArrowRight, AlertTriangle, CheckCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Store, CreditCard, MapPin, Ticket, LogOut, ArrowRight, AlertTriangle, CheckCircle, PartyPopper } from "lucide-react";
 import { RefundRequestDialog } from "@/components/common/RefundRequestDialog";
 import { API_URL } from "@/lib/config";
 
@@ -24,6 +26,19 @@ const tierLabels: Record<string, { name: string; color: string }> = {
 function SubscriptionContent() {
   const { token, user, logout } = useAuth();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+
+  // 檢查是否從結帳成功頁面跳轉過來
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      setShowSuccessBanner(true);
+      // 清除 URL 中的 success 參數，避免重新整理時再次顯示
+      const url = new URL(window.location.href);
+      url.searchParams.delete("success");
+      window.history.replaceState({}, "", url.pathname);
+    }
+  }, [searchParams]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["merchant-subscription", token],
@@ -89,6 +104,16 @@ function SubscriptionContent() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
+            {showSuccessBanner && (
+              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+                <PartyPopper className="h-4 w-4 text-green-600" />
+                <AlertTitle className="text-green-700 dark:text-green-300">訂閱成功！</AlertTitle>
+                <AlertDescription className="text-green-700 dark:text-green-300">
+                  感謝您的訂閱，您的方案已啟用。如有任何問題，請聯繫客服。
+                </AlertDescription>
+              </Alert>
+            )}
+
             {isLoading ? (
               <div className="space-y-4">
                 <Skeleton className="h-24 w-full" />
@@ -222,10 +247,33 @@ function SubscriptionContent() {
   );
 }
 
+function LoadingState() {
+  return (
+    <main className="min-h-[calc(100vh-12rem)] bg-muted/30 py-12 px-6">
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-32" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-24 w-full" />
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
+}
+
 export default function SubscriptionPage() {
   return (
     <AuthGuard>
-      <SubscriptionContent />
+      <Suspense fallback={<LoadingState />}>
+        <SubscriptionContent />
+      </Suspense>
     </AuthGuard>
   );
 }
