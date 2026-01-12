@@ -1,25 +1,21 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Route, ChevronRight } from "lucide-react";
+import { MapPin, Route } from "lucide-react";
 import { API_URL } from "@/lib/config";
 
+// 使用新的 SEO 模組
+import {
+  generateCityTripsMetadata,
+  cityTripsBreadcrumb,
+  generateCityTripsJsonLd,
+  SeoPageHeader,
+  JsonLdScript,
+  type Trip,
+  type District,
+} from "@/features/seo";
+
 export const revalidate = 3600;
-
-interface Trip {
-  id: number;
-  title: string;
-  city: string;
-  district: string;
-  description: string;
-  placeCount: number;
-}
-
-interface District {
-  name: string;
-  tripCount: number;
-}
 
 interface Props {
   params: Promise<{ city: string }>;
@@ -49,13 +45,11 @@ function groupTripsByDistrict(trips: Trip[]): District[] {
   }));
 }
 
+// ✅ 使用統一的 metadata 產生器
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;
   const decodedCity = decodeURIComponent(city);
-  return {
-    title: `${decodedCity}行程 | Mibu`,
-    description: `探索${decodedCity}的精選旅遊行程，發現最棒的一日遊規劃。`,
-  };
+  return generateCityTripsMetadata(decodedCity);
 }
 
 export default async function CityTripsPage({ params }: Props) {
@@ -64,25 +58,21 @@ export default async function CityTripsPage({ params }: Props) {
   const trips = await getTripsByCity(decodedCity);
   const districts = groupTripsByDistrict(trips);
 
+  // ✅ 產生麵包屑和 JSON-LD
+  const breadcrumbItems = cityTripsBreadcrumb(decodedCity);
+  const jsonLd = generateCityTripsJsonLd(decodedCity, trips);
+
   return (
     <div className="flex flex-col">
-      <section className="bg-primary/5 py-12 md:py-16">
-        <div className="max-w-5xl mx-auto px-6">
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
-            <Link href="/" className="hover:text-foreground">首頁</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href="/trips" className="hover:text-foreground">行程</Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="text-foreground">{decodedCity}</span>
-          </nav>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {decodedCity}行程
-          </h1>
-          <p className="text-muted-foreground">
-            探索{decodedCity}的精選旅遊行程
-          </p>
-        </div>
-      </section>
+      {/* ✅ JSON-LD 結構化資料 */}
+      <JsonLdScript data={jsonLd} />
+
+      {/* ✅ 使用統一的 SEO 頁面 Header */}
+      <SeoPageHeader
+        breadcrumbItems={breadcrumbItems}
+        title={`${decodedCity}行程`}
+        subtitle={`探索${decodedCity}的精選旅遊行程`}
+      />
 
       <section className="py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-6">
