@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { API_URL } from '@/lib/config';
 
 interface RefundEligibility {
   subscriptionId: number;
@@ -20,8 +21,6 @@ interface RefundEligibility {
 }
 
 export function useRefundEligibility(subscriptionId: number | undefined) {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-  
   return useQuery<RefundEligibility>({
     queryKey: ['refund-eligibility', subscriptionId],
     queryFn: async () => {

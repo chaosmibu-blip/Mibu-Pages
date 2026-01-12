@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { SiGoogle, SiApple } from "react-icons/si";
+import { API_URL } from "@/lib/config";
 
 interface User {
   id: string;
@@ -25,8 +26,6 @@ export function SocialLoginButtons({ onSuccess, onError, disabled = false }: Soc
   const [appleLoading, setAppleLoading] = useState(false);
   const [googleInitialized, setGoogleInitialized] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
   const handleSocialLogin = useCallback(async (provider: "google" | "apple", idToken: string) => {
     const endpoint = provider === "google" ? "/api/auth/google" : "/api/auth/apple";

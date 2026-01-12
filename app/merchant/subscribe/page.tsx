@@ -15,6 +15,7 @@ import { CreditCard, Check, ArrowLeft, Info, Store, Map, Loader2, Building2 } fr
 import { useToast } from "@/hooks/use-toast";
 import { useRecur } from "recur-tw";
 import Link from "next/link";
+import { API_URL } from "@/lib/config";
 
 interface PlanConfig {
   name: string;
@@ -71,7 +72,6 @@ function SubscribeContent() {
 
   const planId = searchParams.get("plan") || "";
   const planInfo = PLAN_INFO[planId];
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
   const handleCheckout = async () => {
     if (!planInfo) return;

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Store, Calendar, CreditCard, ExternalLink, LogOut } from "lucide-react";
+import { API_URL } from "@/lib/config";
 
 interface Subscription {
   plan: string;
@@ -23,8 +24,6 @@ export default function MerchantDashboardPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-      
       try {
         const res = await fetch(`${API_URL}/api/merchant/subscription`, {
           credentials: "include",
@@ -56,8 +55,6 @@ export default function MerchantDashboardPage() {
   }, [router]);
 
   const handleLogout = async () => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-    
     try {
       await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",

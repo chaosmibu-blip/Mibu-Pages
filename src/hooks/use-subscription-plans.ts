@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { API_URL } from "@/lib/config";
 
 export interface SubscriptionPlan {
   id: string;
@@ -14,8 +15,6 @@ export interface SubscriptionPlan {
 }
 
 export function useSubscriptionPlans() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-
   return useQuery<SubscriptionPlan[]>({
     queryKey: ["subscription-plans"],
     queryFn: async () => {

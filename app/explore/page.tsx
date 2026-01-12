@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AppDownloadCTA } from "@/components/common/AppDownloadCTA";
 import { MapPin, Building2, Globe } from "lucide-react";
+import { API_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "探索城市 | Mibu 旅遊扭蛋",
@@ -29,8 +30,6 @@ const FALLBACK_CITIES: City[] = [
 ];
 
 async function getCities(): Promise<City[]> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://591965a7-25f6-479c-b527-3890b1193c21-00-1m08cwv9a4rev.picard.replit.dev";
-  
   try {
     const res = await fetch(`${API_URL}/api/seo/cities`, {
       next: { revalidate: 3600 },

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Route, ChevronRight, Star, ArrowRight, ArrowDown, Download } from "lucide-react";
+import { API_URL } from "@/lib/config";
 
 export const revalidate = 3600;
 
@@ -39,8 +40,6 @@ interface TripDetail {
 interface Props {
   params: Promise<{ id: string }>;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://591965a7-25f6-479c-b527-3890b1193c21-00-1m08cwv9a4rev.picard.replit.dev";
 
 async function getTripDetail(id: string): Promise<TripDetail | null> {
   try {
