@@ -3,7 +3,7 @@
  */
 
 import type { Metadata } from 'next';
-import type { City, CityDetail } from '../types';
+import type { City, CityInfo } from '../types';
 import {
   SEO_CONFIG,
   TITLE_TEMPLATES,
@@ -16,15 +16,17 @@ import {
 
 /**
  * 產生城市詳情頁的 Metadata
+ * @param city - 城市列表項目或城市詳情中的城市資訊
  */
-export function generateCityMetadata(city: City | CityDetail): Metadata {
+export function generateCityMetadata(city: City | CityInfo): Metadata {
   const title = TITLE_TEMPLATES.city(city.name, city.placeCount);
   const description = truncateDescription(
-    DESCRIPTION_TEMPLATES.city(city.name, city.nameEn, city.description)
+    DESCRIPTION_TEMPLATES.city(city.name, city.country)
   );
-  const keywords = KEYWORDS_TEMPLATES.city(city.name, city.nameEn, city.country);
+  const keywords = KEYWORDS_TEMPLATES.city(city.name, city.country);
   const url = canonicalUrl(`/city/${city.slug}`);
-  const ogImage = city.coverImage || SEO_CONFIG.defaultOgImage;
+  // City 列表有 imageUrl，CityInfo 沒有
+  const ogImage = ('imageUrl' in city && city.imageUrl) || SEO_CONFIG.defaultOgImage;
 
   return {
     title: formatTitle(title),

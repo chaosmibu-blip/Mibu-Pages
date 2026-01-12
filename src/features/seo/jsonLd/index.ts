@@ -25,6 +25,7 @@ export {
 export {
   generateCityJsonLd,
   generateCityPlacesListJsonLd,
+  generatePlacesListJsonLd,
   generateCityListJsonLd,
 } from './city';
 
@@ -34,6 +35,7 @@ export { generatePlaceJsonLd } from './place';
 // 行程
 export {
   generateTripJsonLd,
+  generateTripWithPlacesJsonLd,
   generateTripListJsonLd,
   generateCityTripsJsonLd,
   generateDistrictTripsJsonLd,

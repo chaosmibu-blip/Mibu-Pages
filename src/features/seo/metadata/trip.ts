@@ -3,7 +3,7 @@
  */
 
 import type { Metadata } from 'next';
-import type { Trip, TripDetail } from '../types';
+import type { Trip } from '../types';
 import {
   SEO_CONFIG,
   TITLE_TEMPLATES,
@@ -16,15 +16,17 @@ import {
 
 /**
  * 產生行程詳情頁的 Metadata
+ * @param trip - 行程資料
  */
-export function generateTripMetadata(trip: Trip | TripDetail): Metadata {
+export function generateTripMetadata(trip: Trip): Metadata {
   const title = TITLE_TEMPLATES.trip(trip.title);
   const description = truncateDescription(
     DESCRIPTION_TEMPLATES.trip(trip.title, trip.city, trip.placeCount, trip.description)
   );
-  const keywords = KEYWORDS_TEMPLATES.trip(trip.city, trip.district);
+  // district 可能是 null，用 city 替代
+  const keywords = KEYWORDS_TEMPLATES.trip(trip.city, trip.district || trip.city);
   const url = canonicalUrl(`/trip/${trip.id}`);
-  const ogImage = trip.coverImage || SEO_CONFIG.defaultOgImage;
+  const ogImage = trip.imageUrl || SEO_CONFIG.defaultOgImage;
 
   return {
     title: formatTitle(title),

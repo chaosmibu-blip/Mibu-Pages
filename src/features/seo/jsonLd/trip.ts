@@ -3,24 +3,27 @@
  */
 
 import { SEO_CONFIG } from '../metadata/templates';
-import type { Trip, TripDetail, TripSummary } from '../types';
+import type { Trip, TripDetailResponse, TripSummary, TripPlace } from '../types';
 import type { TouristTrip, ItemList } from './types';
 
 /**
  * 產生行程的 JSON-LD (TouristTrip schema)
+ * @param tripDetail - 行程詳情回應
  */
-export function generateTripJsonLd(trip: TripDetail): TouristTrip {
+export function generateTripJsonLd(tripDetail: TripDetailResponse): TouristTrip {
+  const { trip, places } = tripDetail;
+
   const itinerary: ItemList = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: `${trip.title} 行程安排`,
-    numberOfItems: trip.places.length,
-    itemListElement: trip.places.map((place, index) => ({
+    numberOfItems: places.length,
+    itemListElement: places.map((place, index) => ({
       '@type': 'ListItem' as const,
       position: index + 1,
       name: place.name,
-      url: `${SEO_CONFIG.baseUrl}/place/${place.slug}`,
-      image: place.imageUrl,
+      url: `${SEO_CONFIG.baseUrl}/place/${place.id}`,
+      image: place.imageUrl || undefined,
       description: place.description,
     })),
   };
@@ -30,7 +33,39 @@ export function generateTripJsonLd(trip: TripDetail): TouristTrip {
     '@type': 'TouristTrip',
     name: trip.title,
     description: trip.description,
-    image: trip.coverImage || SEO_CONFIG.defaultOgImage,
+    image: trip.imageUrl || SEO_CONFIG.defaultOgImage,
+    touristType: '自由行旅客',
+    itinerary,
+  };
+}
+
+/**
+ * 從行程和景點陣列產生 JSON-LD
+ * @param trip - 行程資料
+ * @param places - 景點陣列
+ */
+export function generateTripWithPlacesJsonLd(trip: Trip, places: TripPlace[]): TouristTrip {
+  const itinerary: ItemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${trip.title} 行程安排`,
+    numberOfItems: places.length,
+    itemListElement: places.map((place, index) => ({
+      '@type': 'ListItem' as const,
+      position: index + 1,
+      name: place.name,
+      url: `${SEO_CONFIG.baseUrl}/place/${place.id}`,
+      image: place.imageUrl || undefined,
+      description: place.description,
+    })),
+  };
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TouristTrip',
+    name: trip.title,
+    description: trip.description,
+    image: trip.imageUrl || SEO_CONFIG.defaultOgImage,
     touristType: '自由行旅客',
     itinerary,
   };
@@ -39,6 +74,9 @@ export function generateTripJsonLd(trip: TripDetail): TouristTrip {
 /**
  * 產生行程列表的 JSON-LD
  * 用於行程總覽頁、城市行程頁、區域行程頁
+ * @param trips - 行程列表
+ * @param listName - 列表名稱
+ * @param listDescription - 列表描述
  */
 export function generateTripListJsonLd(
   trips: Trip[] | TripSummary[],
@@ -56,13 +94,16 @@ export function generateTripListJsonLd(
       position: index + 1,
       name: trip.title,
       url: `${SEO_CONFIG.baseUrl}/trip/${trip.id}`,
-      description: `${trip.city} ${trip.district} - ${trip.placeCount} 個景點`,
+      // district 可能是 null
+      description: `${trip.city}${trip.district ? ` ${trip.district}` : ''} - ${trip.placeCount} 個景點`,
     })),
   };
 }
 
 /**
  * 產生城市行程列表的 JSON-LD
+ * @param cityName - 城市名稱
+ * @param trips - 行程列表
  */
 export function generateCityTripsJsonLd(cityName: string, trips: Trip[]): ItemList {
   return generateTripListJsonLd(
@@ -74,6 +115,9 @@ export function generateCityTripsJsonLd(cityName: string, trips: Trip[]): ItemLi
 
 /**
  * 產生區域行程列表的 JSON-LD
+ * @param cityName - 城市名稱
+ * @param districtName - 區域名稱
+ * @param trips - 行程列表
  */
 export function generateDistrictTripsJsonLd(
   cityName: string,

@@ -49,10 +49,9 @@ export const TITLE_TEMPLATES = {
 } as const;
 
 export const DESCRIPTION_TEMPLATES = {
-  // 城市頁面
-  city: (name: string, nameEn: string, description?: string) =>
-    description ||
-    `探索${name}(${nameEn})的熱門景點和隱藏好去處。用 Mibu 旅遊扭蛋發現${name}最棒的旅遊體驗。`,
+  // 城市頁面（後端沒有 nameEn，用 country 替代）
+  city: (name: string, country: string) =>
+    `探索${name}的熱門景點和隱藏好去處。${country}旅遊必去，用 Mibu 旅遊扭蛋發現${name}最棒的旅遊體驗。`,
 
   // 景點頁面
   place: (name: string, cityName: string, description?: string) =>
@@ -84,13 +83,13 @@ export const DESCRIPTION_TEMPLATES = {
 // ============ 關鍵字模板 ============
 
 export const KEYWORDS_TEMPLATES = {
-  city: (name: string, nameEn: string, country: string) => [
+  city: (name: string, country: string) => [
     `${name}景點`,
     `${name}旅遊`,
     `${name}必去`,
     `${name}推薦`,
-    `${nameEn} travel`,
-    `${nameEn} attractions`,
+    `${name} travel`,
+    `${name} attractions`,
     `${country}旅遊`,
   ],
 

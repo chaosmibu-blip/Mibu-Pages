@@ -1,114 +1,213 @@
 /**
  * SEO 模組型別定義
  *
- * 統一定義所有 SEO 相關的資料結構
+ * 根據後端 API 實際回傳格式定義
  */
-
-// ============ 城市相關 ============
-
-export interface City {
-  id: number;
-  slug: string;
-  name: string;
-  nameEn: string;
-  country: string;
-  description: string;
-  coverImage?: string;
-  placeCount: number;
-  tripCount?: number;
-}
-
-export interface CityDetail extends City {
-  places?: PlaceSummary[];
-  relatedCities?: CitySummary[];
-  topCategories?: string[];
-}
-
-export interface CitySummary {
-  slug: string;
-  name: string;
-  coverImage?: string;
-}
-
-// ============ 景點相關 ============
-
-export interface Place {
-  id: number | string;
-  slug: string;
-  name: string;
-  nameEn?: string;
-  category: string;
-  subcategory?: string;
-  description: string;
-  coverImage?: string;
-  rating?: number;
-  reviewCount?: number;
-  address?: string;
-  phone?: string;
-  website?: string;
-  openingHours?: string;
-  location?: GeoLocation;
-  city: CitySummary;
-}
-
-export interface PlaceSummary {
-  id: number | string;
-  slug: string;
-  name: string;
-  category: string;
-  rating?: number;
-  reviewCount?: number;
-  coverImage?: string;
-}
-
-// ============ 行程相關 ============
-
-export interface Trip {
-  id: number;
-  title: string;
-  city: string;
-  district: string;
-  description: string;
-  placeCount: number;
-  duration?: string;
-  coverImage?: string;
-  publishedAt?: string;
-}
-
-export interface TripDetail extends Trip {
-  places: TripPlace[];
-  relatedTrips?: TripSummary[];
-}
-
-export interface TripPlace {
-  id: number | string;
-  name: string;
-  slug: string;
-  category: string;
-  rating?: number;
-  imageUrl?: string;
-  description?: string;
-  location?: GeoLocation;
-}
-
-export interface TripSummary {
-  id: number;
-  title: string;
-  city: string;
-  district: string;
-  placeCount: number;
-}
 
 // ============ 通用型別 ============
 
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
 export interface GeoLocation {
-  lat: number;
-  lng: number;
+  lat: string;
+  lng: string;
+}
+
+export interface I18nText {
+  en?: string;
+  ja?: string;
+  ko?: string;
 }
 
 export interface BreadcrumbItem {
   label: string;
   href?: string;
+}
+
+// ============ 城市相關 ============
+
+/** 城市列表項目 - GET /api/seo/cities */
+export interface City {
+  name: string;
+  slug: string;
+  country: string;
+  placeCount: number;
+  tripCount: number;
+  imageUrl: string | null;
+}
+
+/** 城市詳情中的城市資訊 */
+export interface CityInfo {
+  name: string;
+  slug: string;
+  country: string;
+  placeCount: number;
+}
+
+/** 城市詳情回應 - GET /api/seo/cities/:slug */
+export interface CityDetailResponse {
+  city: CityInfo;
+  places: PlaceInCity[];
+  pagination: Pagination;
+}
+
+/** 城市摘要（用於 related） */
+export interface CitySummary {
+  name: string;
+  slug: string;
+  country: string;
+  placeCount?: number;
+  imageUrl?: string | null;
+}
+
+/** 相關城市回應 - GET /api/seo/cities/:slug/related */
+export interface RelatedCitiesResponse {
+  city: {
+    name: string;
+    slug: string;
+    country: string;
+  };
+  relatedCities: CitySummary[];
+  total: number;
+}
+
+/** 城市列表回應 */
+export interface CitiesResponse {
+  cities: City[];
+  total: number;
+  message?: string;
+}
+
+// ============ 景點相關 ============
+
+/** 城市詳情頁中的景點 */
+export interface PlaceInCity {
+  id: number;
+  name: string;
+  slug: string;
+  nameI18n?: I18nText;
+  district: string;
+  address: string;
+  category: string;
+  subcategory: string;
+  rating: number;
+  photoReference: string | null;
+  description: string;
+  googlePlaceId: string;
+  imageUrl: string | null;
+}
+
+/** 景點詳情 - GET /api/seo/places/by-id/:id */
+export interface Place {
+  id: number;
+  name: string;
+  slug: string;
+  nameI18n?: I18nText;
+  country: string;
+  city: string;
+  district: string;
+  address: string;
+  addressI18n?: I18nText;
+  category: string;
+  subcategory: string;
+  description: string;
+  descriptionI18n?: I18nText;
+  rating: number;
+  imageUrl: string | null;
+  openingHours: unknown;
+  location: GeoLocation | null;
+  googlePlaceId: string;
+  googleMapUrl: string | null;
+}
+
+/** 景點詳情回應 */
+export interface PlaceDetailResponse {
+  place: Place;
+  relatedPlaces: PlaceSummary[];
+}
+
+/** 景點摘要（用於 related） */
+export interface PlaceSummary {
+  id: number;
+  name: string;
+  slug: string;
+  district: string;
+  category: string;
+  rating: number;
+  imageUrl: string | null;
+}
+
+// ============ 行程相關 ============
+
+/** 行程列表項目 - GET /api/seo/trips */
+export interface Trip {
+  id: number;
+  sessionId: string;
+  title: string;
+  city: string;
+  district: string | null;
+  description: string;
+  imageUrl: string | null;
+  placeCount: number;
+  categoryDistribution: unknown;
+  publishedAt: string;
+}
+
+/** 行程詳情回應 - GET /api/seo/trips/:id */
+export interface TripDetailResponse {
+  trip: Trip;
+  places: TripPlace[];
+}
+
+/** 行程中的景點 */
+export interface TripPlace {
+  id: number;
+  name: string;
+  slug: string;
+  district: string;
+  category: string;
+  subcategory: string;
+  address: string;
+  description: string;
+  rating: number;
+  imageUrl: string | null;
+  location: GeoLocation | null;
+}
+
+/** 行程摘要（用於 related） */
+export interface TripSummary {
+  id: number;
+  title: string;
+  city: string;
+  district: string | null;
+  description: string;
+  imageUrl: string | null;
+  placeCount: number;
+  publishedAt: string;
+}
+
+/** 相關行程回應 - GET /api/seo/trips/:id/related */
+export interface RelatedTripsResponse {
+  trip: {
+    id: number;
+    city: string;
+    district: string | null;
+  };
+  relatedTrips: TripSummary[];
+  total: number;
+}
+
+/** 行程列表回應 */
+export interface TripsResponse {
+  trips: Trip[];
+  pagination: Pagination;
 }
 
 // ============ 區域相關 ============

@@ -58,11 +58,13 @@ export {
   // 城市
   generateCityJsonLd,
   generateCityPlacesListJsonLd,
+  generatePlacesListJsonLd,
   generateCityListJsonLd,
   // 景點
   generatePlaceJsonLd,
   // 行程
   generateTripJsonLd,
+  generateTripWithPlacesJsonLd,
   generateTripListJsonLd,
   generateCityTripsJsonLd,
   generateDistrictTripsJsonLd,
@@ -70,3 +72,20 @@ export {
 
 // ============ 組件 ============
 export { JsonLdScript, Breadcrumb, SeoPageHeader } from './components';
+
+// ============ API 資料獲取 ============
+export {
+  // 城市
+  getCities,
+  getCityDetail,
+  getRelatedCities,
+  // 景點
+  getPlaceById,
+  getAllPlaceIds,
+  // 行程
+  getTrips,
+  getTripsByCity,
+  getTripsByCityAndDistrict,
+  getTripDetail,
+  getRelatedTrips,
+} from './api';
