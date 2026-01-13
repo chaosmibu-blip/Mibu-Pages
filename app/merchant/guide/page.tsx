@@ -11,6 +11,7 @@ import {
   ArrowRight, PlayCircle, HelpCircle, ExternalLink, Sparkles,
   BarChart3, Users, Gift, ChevronRight
 } from "lucide-react";
+import { MerchantNav } from "@/components/common/MerchantNav";
 
 interface Step {
   id: string;
@@ -122,6 +123,7 @@ export default function GuidePage() {
   return (
     <main className="min-h-[calc(100vh-12rem)] bg-muted/30 py-12 px-6">
       <div className="max-w-4xl mx-auto">
+        <MerchantNav />
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">

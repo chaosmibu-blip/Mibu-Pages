@@ -17,6 +17,7 @@ import {
   ArrowUpRight, RefreshCw, Clock
 } from "lucide-react";
 import { RefundRequestDialog } from "@/components/common/RefundRequestDialog";
+import { MerchantNav } from "@/components/common/MerchantNav";
 import { API_URL } from "@/lib/config";
 
 const tierLabels: Record<string, { name: string; color: string; description: string }> = {
@@ -89,7 +90,8 @@ function SubscriptionContent() {
 
   return (
     <main className="min-h-[calc(100vh-12rem)] bg-muted/30 py-12 px-6">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <MerchantNav />
         <Card>
           <CardHeader>
             <div className="flex justify-between items-start gap-4 flex-wrap">

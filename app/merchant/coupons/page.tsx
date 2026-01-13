@@ -16,6 +16,7 @@ import {
   Plus, BarChart3, Tag, ArrowUpRight
 } from "lucide-react";
 import { API_URL } from "@/lib/config";
+import { MerchantNav } from "@/components/common/MerchantNav";
 
 const tierQuotas: Record<string, { maxCoupons: number | null; description: string }> = {
   free: { maxCoupons: 5, description: "升級方案可解鎖更多優惠券額度" },
@@ -51,6 +52,7 @@ function CouponsContent() {
   return (
     <main className="min-h-[calc(100vh-12rem)] bg-muted/30 py-12 px-6">
       <div className="max-w-2xl mx-auto space-y-6">
+        <MerchantNav />
         {/* Header */}
         <Card>
           <CardHeader>
