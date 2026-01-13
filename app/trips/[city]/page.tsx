@@ -37,6 +37,8 @@ async function getTripsByCity(city: string): Promise<Trip[]> {
 function groupTripsByDistrict(trips: Trip[]): District[] {
   const districtMap = new Map<string, number>();
   trips.forEach((trip) => {
+    // 跳過沒有 district 的行程
+    if (!trip.district) return;
     districtMap.set(trip.district, (districtMap.get(trip.district) || 0) + 1);
   });
   return Array.from(districtMap.entries()).map(([name, tripCount]) => ({
