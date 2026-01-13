@@ -39,7 +39,7 @@ export function generatePlaceMetadata(place: Place): Metadata {
       url,
       siteName: SEO_CONFIG.siteName,
       locale: SEO_CONFIG.locale,
-      type: 'place',
+      type: 'website',
       images: [
         {
           url: ogImage,
