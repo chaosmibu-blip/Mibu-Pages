@@ -76,6 +76,13 @@ app/                    # Next.js App Router 頁面
 └── robots.ts           # robots.txt
 
 src/
+├── features/
+│   └── seo/            # SEO 模組化架構（程式化 SEO 用）
+│       ├── api/        # API 資料獲取層
+│       ├── metadata/   # Metadata 產生器
+│       ├── jsonLd/     # JSON-LD 結構化資料產生器
+│       ├── components/ # SEO 專用組件（Breadcrumb, JsonLdScript）
+│       └── types/      # 型別定義
 ├── components/
 │   ├── ui/             # shadcn/ui 元件
 │   ├── layout/         # Header, Footer
@@ -170,10 +177,11 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 ## 路徑別名
 
 ```
-@/*           → ./src/*
+@/*            → ./src/*
+@/features/*   → ./src/features/*
 @/components/* → ./src/components/*
-@/lib/*       → ./src/lib/*
-@/hooks/*     → ./src/hooks/*
+@/lib/*        → ./src/lib/*
+@/hooks/*      → ./src/hooks/*
 ```
 
 ## 開發原則
@@ -198,3 +206,47 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 | **部署** | Replit Publish |
 
 官網相對單純，主要是 UI 實作和 API 串接，熟悉 Next.js 即可快速上手。
+
+## SEO 模組架構
+
+位於 `src/features/seo/`，用於程式化 SEO。
+
+### 使用方式
+
+```tsx
+import {
+  // API 獲取
+  getCities, getCityDetail, getRelatedCities,
+  getTripsByCity, getTripDetail, getRelatedTrips,
+  getPlaceById,
+
+  // Metadata 產生器
+  generateCityMetadata, generatePlaceMetadata, generateTripMetadata,
+  generateCityTripsMetadata, generateDistrictTripsMetadata,
+
+  // JSON-LD 產生器
+  generateCityJsonLd, generatePlaceJsonLd, generateTripJsonLd,
+  generatePlacesListJsonLd, generateCityTripsJsonLd,
+  cityBreadcrumb, placeBreadcrumb, tripDetailBreadcrumb,
+
+  // 組件
+  Breadcrumb, JsonLdScript, SeoPageHeader,
+
+  // 型別
+  type City, type Place, type Trip,
+  type CityDetailResponse, type PlaceDetailResponse, type TripDetailResponse,
+} from '@/features/seo';
+```
+
+### SEO API 端點
+
+| 端點 | 用途 |
+|------|------|
+| `GET /api/seo/cities` | 城市列表 |
+| `GET /api/seo/cities/:slug` | 城市詳情（含景點） |
+| `GET /api/seo/cities/:slug/related` | 相關城市 |
+| `GET /api/seo/places/by-id/:id` | 景點詳情（含相關景點） |
+| `GET /api/seo/trips` | 行程列表 |
+| `GET /api/seo/trips?city=xxx` | 城市行程 |
+| `GET /api/seo/trips/:id` | 行程詳情（含景點） |
+| `GET /api/seo/trips/:id/related` | 相關行程 |
