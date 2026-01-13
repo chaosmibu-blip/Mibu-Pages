@@ -128,12 +128,14 @@ function SubscribeContent() {
             });
             router.push("/merchant/subscription?success=true");
           },
-          onError: (error: Error) => {
-            console.error("訂閱失敗:", error.message);
+          onError: (error) => {
+            console.error("訂閱失敗:", error);
             setIsLoading(false);
             toast({
               title: "結帳失敗",
-              description: error.message || "請稍後再試",
+              description: typeof error === 'object' && error && 'message' in error
+                ? String(error.message)
+                : "請稍後再試",
               variant: "destructive",
             });
           },
