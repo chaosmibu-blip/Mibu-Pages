@@ -21,7 +21,7 @@ export function DownloadButton({
 
   const handleClick = () => {
     if (platform === "ios") {
-      window.open("https://apps.apple.com/app/mibu", "_blank");
+      window.open("https://apps.apple.com/tw/app/mibu/id6756925221", "_blank");
     } else {
       toast({
         title: "敬請期待",

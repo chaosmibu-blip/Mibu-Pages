@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, Ticket, BookOpen } from "lucide-react";
+import { CreditCard, MapPin, Ticket, BookOpen } from "lucide-react";
 
 const navItems = [
   { href: "/merchant/subscription", label: "我的訂閱", icon: CreditCard },
+  { href: "/merchant/places", label: "景點管理", icon: MapPin },
   { href: "/merchant/coupons", label: "優惠券管理", icon: Ticket },
   { href: "/merchant/guide", label: "新手教學", icon: BookOpen },
 ];
