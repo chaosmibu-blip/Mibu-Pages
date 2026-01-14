@@ -10,7 +10,6 @@ import {
   BookOpen,
   Store,
   ChevronRight,
-  HelpCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -56,21 +55,20 @@ export function MerchantSidebar({ className }: MerchantSidebarProps) {
 
   return (
     <aside className={cn('w-64 shrink-0', className)}>
-      {/* 深棕色側邊欄容器 */}
-      <div className="sticky top-20 bg-sidebar text-sidebar-foreground rounded-2xl p-4 shadow-lg">
+      <div className="sticky top-20 space-y-2">
         {/* 商家標識 */}
-        <div className="flex items-center gap-3 px-3 py-4 mb-2 border-b border-sidebar-border">
-          <div className="p-2.5 bg-sidebar-primary/20 rounded-xl">
-            <Store className="h-5 w-5 text-sidebar-primary" />
+        <div className="flex items-center gap-3 px-4 py-3 mb-4">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Store className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <p className="font-semibold text-sidebar-foreground">商家後台</p>
-            <p className="text-xs text-sidebar-foreground/60">管理您的商家資訊</p>
+            <p className="font-medium text-foreground">商家後台</p>
+            <p className="text-xs text-muted-foreground">管理您的商家資訊</p>
           </div>
         </div>
 
         {/* 導航項目 */}
-        <nav className="space-y-1 py-2">
+        <nav className="space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -80,28 +78,23 @@ export function MerchantSidebar({ className }: MerchantSidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group',
+                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all group',
                   isActive
-                    ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md'
-                    : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
-                <Icon className={cn(
-                  'h-5 w-5 shrink-0 transition-transform',
-                  isActive ? '' : 'group-hover:scale-110'
-                )} />
+                <Icon className="h-5 w-5 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{item.label}</p>
                   {!isActive && (
-                    <p className="text-xs opacity-60 truncate">{item.description}</p>
+                    <p className="text-xs opacity-70 truncate">{item.description}</p>
                   )}
                 </div>
                 <ChevronRight
                   className={cn(
-                    'h-4 w-4 shrink-0 transition-all',
-                    isActive
-                      ? 'opacity-100 translate-x-0'
-                      : 'opacity-0 -translate-x-2 group-hover:opacity-50 group-hover:translate-x-0'
+                    'h-4 w-4 shrink-0 transition-transform',
+                    isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'
                   )}
                 />
               </Link>
@@ -110,12 +103,11 @@ export function MerchantSidebar({ className }: MerchantSidebarProps) {
         </nav>
 
         {/* 幫助連結 */}
-        <div className="pt-3 mt-2 border-t border-sidebar-border">
+        <div className="pt-4 mt-4 border-t">
           <Link
             href="/support"
-            className="flex items-center gap-2 px-3 py-2.5 text-sm text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-all"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <HelpCircle className="h-4 w-4" />
             需要協助？聯繫客服
           </Link>
         </div>
