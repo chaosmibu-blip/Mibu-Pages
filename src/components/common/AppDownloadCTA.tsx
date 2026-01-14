@@ -16,7 +16,7 @@ export function AppDownloadCTA({ variant = "default", className = "" }: AppDownl
   const { toast } = useToast();
 
   const handleIOSClick = () => {
-    window.open("https://mibu-travel.com", "_blank");
+    window.open("https://apps.apple.com/us/app/mibu/id6756925221", "_blank");
   };
 
   const handleAndroidClick = () => {
