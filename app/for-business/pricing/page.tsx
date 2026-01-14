@@ -301,40 +301,125 @@ export default function PricingPage() {
             </p>
           </div>
 
+          {/* 等級卡片展示 */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            {/* SP */}
+            <div className="relative group">
+              <div className="tier-sp rounded-2xl p-4 text-center text-white shadow-lg transform transition-transform hover:scale-105">
+                <div className="text-2xl font-bold mb-1">SP</div>
+                <div className="text-xs opacity-90">2% 機率</div>
+                <div className="absolute -top-1 -right-1 text-lg">⭐</div>
+              </div>
+              <div className="mt-2 text-xs text-center text-muted-foreground">
+                全域跑馬燈・獎池顯示
+              </div>
+            </div>
+
+            {/* SSR */}
+            <div className="relative group">
+              <div className="tier-ssr rounded-2xl p-4 text-center text-white shadow-lg transform transition-transform hover:scale-105">
+                <div className="text-2xl font-bold mb-1">SSR</div>
+                <div className="text-xs opacity-90">8% 機率</div>
+                <div className="absolute -top-1 -right-1 text-lg">💎</div>
+              </div>
+              <div className="mt-2 text-xs text-center text-muted-foreground">
+                獎池顯示・中獎特效
+              </div>
+            </div>
+
+            {/* SR */}
+            <div className="relative group">
+              <div className="tier-sr rounded-2xl p-4 text-center text-white shadow-lg transform transition-transform hover:scale-105">
+                <div className="text-2xl font-bold mb-1">SR</div>
+                <div className="text-xs opacity-90">15% 機率</div>
+                <div className="absolute -top-1 -right-1 text-lg">💫</div>
+              </div>
+              <div className="mt-2 text-xs text-center text-muted-foreground">
+                中獎特效・道具箱圖片
+              </div>
+            </div>
+
+            {/* S */}
+            <div className="relative group">
+              <div className="tier-s rounded-2xl p-4 text-center text-white shadow-lg transform transition-transform hover:scale-105">
+                <div className="text-2xl font-bold mb-1">S</div>
+                <div className="text-xs opacity-90">23% 機率</div>
+              </div>
+              <div className="mt-2 text-xs text-center text-muted-foreground">
+                背景圖片・道具箱圖片
+              </div>
+            </div>
+
+            {/* R */}
+            <div className="relative group">
+              <div className="tier-r rounded-2xl p-4 text-center text-white shadow-lg transform transition-transform hover:scale-105">
+                <div className="text-2xl font-bold mb-1">R</div>
+                <div className="text-xs opacity-90">32% 機率</div>
+              </div>
+              <div className="mt-2 text-xs text-center text-muted-foreground">
+                背景圖片
+              </div>
+            </div>
+          </div>
+
+          {/* 詳細表格 */}
           <div className="overflow-x-auto flex justify-center">
-            <table className="text-sm md:w-auto w-full" data-testid="table-coupon-tiers">
-              <thead>
-                <tr className="border-b">
+            <table className="text-sm md:w-auto w-full bg-card rounded-xl overflow-hidden shadow-sm" data-testid="table-coupon-tiers">
+              <thead className="bg-muted/50">
+                <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 font-semibold">等級</th>
                   <th className="text-left py-3 px-4 font-semibold">機率</th>
                   <th className="text-left py-3 px-4 font-semibold">特效說明</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="py-3 px-4 font-bold text-yellow-600">SP</td>
-                  <td className="py-3 px-4">2%</td>
-                  <td className="py-3 px-4">全域跑馬燈、獎池中顯示、中獎動畫、背景圖片、道具箱圖片</td>
+                <tr className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="py-3 px-4">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="tier-sp px-2 py-0.5 rounded-md text-white text-xs font-bold">SP</span>
+                      <span className="text-yellow-600">⭐</span>
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 font-medium">2%</td>
+                  <td className="py-3 px-4 text-muted-foreground">全域跑馬燈、獎池中顯示、中獎動畫、背景圖片、道具箱圖片</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 font-bold text-purple-600">SSR</td>
-                  <td className="py-3 px-4">8%</td>
-                  <td className="py-3 px-4">獎池中顯示、中獎特效、背景圖片、道具箱圖片</td>
+                <tr className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="py-3 px-4">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="tier-ssr px-2 py-0.5 rounded-md text-white text-xs font-bold">SSR</span>
+                      <span className="text-purple-600">💎</span>
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 font-medium">8%</td>
+                  <td className="py-3 px-4 text-muted-foreground">獎池中顯示、中獎特效、背景圖片、道具箱圖片</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 font-bold text-blue-600">SR</td>
-                  <td className="py-3 px-4">15%</td>
-                  <td className="py-3 px-4">中獎特效、背景圖片、道具箱圖片</td>
+                <tr className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="py-3 px-4">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="tier-sr px-2 py-0.5 rounded-md text-white text-xs font-bold">SR</span>
+                      <span className="text-blue-600">💫</span>
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 font-medium">15%</td>
+                  <td className="py-3 px-4 text-muted-foreground">中獎特效、背景圖片、道具箱圖片</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 font-bold text-green-600">S</td>
-                  <td className="py-3 px-4">23%</td>
-                  <td className="py-3 px-4">背景圖片、道具箱圖片</td>
+                <tr className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="py-3 px-4">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="tier-s px-2 py-0.5 rounded-md text-white text-xs font-bold">S</span>
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 font-medium">23%</td>
+                  <td className="py-3 px-4 text-muted-foreground">背景圖片、道具箱圖片</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 font-bold text-gray-600">R</td>
-                  <td className="py-3 px-4">32%</td>
-                  <td className="py-3 px-4">背景圖片</td>
+                <tr className="hover:bg-muted/30 transition-colors">
+                  <td className="py-3 px-4">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="tier-r px-2 py-0.5 rounded-md text-white text-xs font-bold">R</span>
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 font-medium">32%</td>
+                  <td className="py-3 px-4 text-muted-foreground">背景圖片</td>
                 </tr>
               </tbody>
             </table>
