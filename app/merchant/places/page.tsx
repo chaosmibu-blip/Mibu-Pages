@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { useAuth } from '@/hooks/useAuth';
-import { merchantApi, type MerchantPlace } from '@/services/api/merchant';
+import { merchantApi, type MerchantPlace, type UpdateMerchantPlaceParams } from '@/services/api/merchant';
 import { PlaceCard } from '@/components/merchant/PlaceCard';
 import { PlaceClaimModal } from '@/components/merchant/PlaceClaimModal';
 import { MerchantNav } from '@/components/common/MerchantNav';
@@ -29,9 +29,10 @@ function PlacesContent() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
   const [editingPlace, setEditingPlace] = useState<MerchantPlace | null>(null);
-  const [editForm, setEditForm] = useState({
-    merchantOffer: '',
-    merchantDescription: '',
+  const [editForm, setEditForm] = useState<UpdateMerchantPlaceParams>({
+    promoTitle: '',
+    description: '',
+    googleMapUrl: '',
   });
 
   // 取得商家資料（含配額）
@@ -54,19 +55,11 @@ function PlacesContent() {
 
   // 更新景點資訊
   const updateMutation = useMutation({
-    mutationFn: ({ linkId, data }: { linkId: number; data: typeof editForm }) =>
-      merchantApi.updatePlace(linkId, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateMerchantPlaceParams }) =>
+      merchantApi.updatePlace(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantPlaces'] });
       setEditingPlace(null);
-    },
-  });
-
-  // 取消認領
-  const unclaimMutation = useMutation({
-    mutationFn: (linkId: number) => merchantApi.unclaimPlace(linkId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['merchantPlaces'] });
     },
   });
 
@@ -77,20 +70,15 @@ function PlacesContent() {
   const handleEdit = (place: MerchantPlace) => {
     setEditingPlace(place);
     setEditForm({
-      merchantOffer: place.merchantOffer || '',
-      merchantDescription: place.merchantDescription || '',
+      promoTitle: place.promoTitle || '',
+      description: place.description || '',
+      googleMapUrl: place.googleMapUrl || '',
     });
   };
 
   const handleSaveEdit = () => {
     if (editingPlace) {
-      updateMutation.mutate({ linkId: editingPlace.linkId, data: editForm });
-    }
-  };
-
-  const handleRemove = (linkId: number) => {
-    if (confirm('確定要取消認領此景點嗎？')) {
-      unclaimMutation.mutate(linkId);
+      updateMutation.mutate({ id: editingPlace.id, data: editForm });
     }
   };
 
@@ -170,12 +158,10 @@ function PlacesContent() {
             <div className="space-y-3">
               {places.map((place) => (
                 <PlaceCard
-                  key={place.linkId}
+                  key={place.id}
                   place={place}
                   variant="owned"
                   onEdit={() => handleEdit(place)}
-                  onRemove={() => handleRemove(place.linkId)}
-                  isLoading={unclaimMutation.isPending}
                 />
               ))}
             </div>
@@ -210,39 +196,54 @@ function PlacesContent() {
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <MapPin className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">{editingPlace.place.name}</p>
+                  <p className="font-medium">{editingPlace.placeName}</p>
                   <p className="text-sm text-muted-foreground">
-                    {editingPlace.place.address}
+                    {editingPlace.city} {editingPlace.district}
                   </p>
                 </div>
-                {editingPlace.isVerified && (
+                {editingPlace.status === 'approved' && (
                   <Badge className="ml-auto bg-green-500">已驗證</Badge>
+                )}
+                {editingPlace.status === 'pending' && (
+                  <Badge className="ml-auto bg-yellow-500">審核中</Badge>
                 )}
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="merchantOffer">優惠資訊</Label>
+              <Label htmlFor="promoTitle">優惠標題</Label>
               <Input
-                id="merchantOffer"
-                value={editForm.merchantOffer}
+                id="promoTitle"
+                value={editForm.promoTitle || ''}
                 onChange={(e) =>
-                  setEditForm({ ...editForm, merchantOffer: e.target.value })
+                  setEditForm({ ...editForm, promoTitle: e.target.value })
                 }
                 placeholder="例：出示 Mibu App 享 9 折優惠"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="merchantDescription">商家描述</Label>
+              <Label htmlFor="description">店家介紹</Label>
               <Textarea
-                id="merchantDescription"
-                value={editForm.merchantDescription}
+                id="description"
+                value={editForm.description || ''}
                 onChange={(e) =>
-                  setEditForm({ ...editForm, merchantDescription: e.target.value })
+                  setEditForm({ ...editForm, description: e.target.value })
                 }
                 placeholder="介紹您的店家特色..."
                 rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="googleMapUrl">Google 地圖連結</Label>
+              <Input
+                id="googleMapUrl"
+                value={editForm.googleMapUrl || ''}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, googleMapUrl: e.target.value })
+                }
+                placeholder="https://maps.google.com/..."
               />
             </div>
 

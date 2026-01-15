@@ -271,8 +271,8 @@ export function CouponForm({
                 <SelectContent>
                   <SelectItem value="">所有景點</SelectItem>
                   {places.map((place) => (
-                    <SelectItem key={place.placeId} value={place.placeId.toString()}>
-                      {place.place.name}
+                    <SelectItem key={place.id} value={place.id.toString()}>
+                      {place.placeName}
                     </SelectItem>
                   ))}
                 </SelectContent>

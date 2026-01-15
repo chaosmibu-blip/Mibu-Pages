@@ -69,38 +69,76 @@ export interface RefundEligibility {
   };
 }
 
-/** 景點資料（商家已認領） */
+/** 商家景點（已認領） */
 export interface MerchantPlace {
-  linkId: number;
-  placeId: number;
+  id: number;
   merchantId: number;
-  place: {
-    id: number;
-    name: string;
-    address: string;
-    city: string;
-    district?: string;
-    category: string;
-    imageUrl?: string;
-    rating?: number;
-  };
-  isVerified: boolean;
-  merchantOffer?: string;
-  merchantDescription?: string;
+  officialPlaceId: number | null;
+  placeCacheId: number | null;
+  googlePlaceId: string | null;
+  placeName: string;
+  district: string;
+  city: string;
+  country: string;
+  description: string | null;
+  googleMapUrl: string | null;
+  openingHours: { weekdayText?: string[]; periods?: unknown[] } | null;
+  status: 'pending' | 'approved' | 'rejected';
+  cardLevel: 'free' | 'pro' | 'premium';
+  promoTitle: string | null;
+  promoDescription: string | null;
+  inventoryImageUrl: string | null;
+  isPromoActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 更新景點參數 */
+export interface UpdateMerchantPlaceParams {
+  description?: string;
+  googleMapUrl?: string;
+  openingHours?: { weekdayText?: string[]; periods?: unknown[] };
+  promoTitle?: string;
+  promoDescription?: string;
+  isPromoActive?: boolean;
+}
+
+/** 可認領的景點（PlaceCache） */
+export interface ClaimablePlace {
+  id: number;
+  placeName: string;
+  district: string;
+  city: string;
+  country: string;
+  category: string;
+  description: string | null;
+  placeId: string | null;        // Google Place ID
+  googleRating: string | null;
+  locationLat: string | null;
+  locationLng: string | null;
   createdAt: string;
 }
 
-/** 可認領的景點 */
-export interface ClaimablePlace {
-  id: number;
-  name: string;
-  address: string;
+/** 新增景點請求 */
+export interface CreatePlaceRequest {
+  placeName: string;
+  district: string;
   city: string;
-  district?: string;
-  category: string;
-  imageUrl?: string;
-  rating?: number;
-  isClaimed: boolean;
+  country: string;
+  address?: string;
+  category?: string;
+  subcategory?: string;
+  description?: string;
+  googlePlaceId?: string;
+  locationLat?: string;
+  locationLng?: string;
+}
+
+/** 新增景點回應（待審核） */
+export interface CreatePlaceResponse {
+  success: boolean;
+  draft: MerchantPlace;
+  message: string;
 }
 
 /** 優惠券 */
@@ -184,36 +222,25 @@ export const merchantApi = {
    * 搜尋可認領的景點
    */
   searchPlaces: (query: string) =>
-    get<{ places: ClaimablePlace[] }>(`/api/merchant/places/search?q=${encodeURIComponent(query)}`),
+    get<{ places: ClaimablePlace[] }>(`/api/merchant/places/search?query=${encodeURIComponent(query)}`),
 
   /**
    * 認領景點
    */
-  claimPlace: (placeId: number) =>
-    post<{ link: MerchantPlace }>('/api/merchant/places/claim', { placeId }),
+  claimPlace: (placeCacheId: number) =>
+    post<{ success: boolean; link: MerchantPlace }>('/api/merchant/places/claim', { placeCacheId }),
 
   /**
-   * 新增自有景點
+   * 新增自有景點（待審核）
    */
-  createPlace: (data: {
-    name: string;
-    address: string;
-    city: string;
-    district?: string;
-    category: string;
-    description?: string;
-  }) => post<{ place: ClaimablePlace; link: MerchantPlace }>('/api/merchant/places/new', data),
+  createPlace: (data: CreatePlaceRequest) =>
+    post<CreatePlaceResponse>('/api/merchant/places/new', data),
 
   /**
-   * 更新景點優惠資訊
+   * 更新景點資訊
    */
-  updatePlace: (linkId: number, data: { merchantOffer?: string; merchantDescription?: string }) =>
-    put<{ link: MerchantPlace }>(`/api/merchant/places/${linkId}`, data),
-
-  /**
-   * 取消認領景點
-   */
-  unclaimPlace: (linkId: number) => del<{ success: boolean }>(`/api/merchant/places/${linkId}`),
+  updatePlace: (id: number, data: UpdateMerchantPlaceParams) =>
+    put<{ success: boolean; link: MerchantPlace }>(`/api/merchant/places/${id}`, data),
 
   // -------- 優惠券管理 --------
 
