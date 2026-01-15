@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Loader2, Plus, X } from 'lucide-react';
+import { Search, MapPin, Loader2, Plus, X, AlertCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { merchantApi, type ClaimablePlace } from '@/services/api/merchant';
+import { merchantApi, type ClaimablePlace, type CreatePlaceRequest } from '@/services/api/merchant';
 import { PlaceCard } from './PlaceCard';
 
 interface PlaceClaimModalProps {
@@ -31,7 +32,7 @@ interface PlaceClaimModalProps {
 }
 
 const categories = [
-  '餐廳',
+  '美食',
   '咖啡廳',
   '景點',
   '住宿',
@@ -49,12 +50,15 @@ export function PlaceClaimModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [showNewPlaceForm, setShowNewPlaceForm] = useState(false);
-  const [newPlace, setNewPlace] = useState({
-    name: '',
-    address: '',
-    city: '',
+  const [successMessage, setSuccessMessage] = useState('');
+  const [newPlace, setNewPlace] = useState<CreatePlaceRequest>({
+    placeName: '',
     district: '',
+    city: '',
+    country: '台灣',
+    address: '',
     category: '',
+    description: '',
   });
 
   const queryClient = useQueryClient();
@@ -74,7 +78,7 @@ export function PlaceClaimModal({
 
   // 認領景點
   const claimMutation = useMutation({
-    mutationFn: (placeId: number) => merchantApi.claimPlace(placeId),
+    mutationFn: (placeCacheId: number) => merchantApi.claimPlace(placeCacheId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchantPlaces'] });
       onSuccess?.();
@@ -82,15 +86,28 @@ export function PlaceClaimModal({
     },
   });
 
-  // 新增自有景點
+  // 新增自有景點（待審核）
   const createMutation = useMutation({
     mutationFn: () => merchantApi.createPlace(newPlace),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['merchantPlaces'] });
-      onSuccess?.();
-      setOpen(false);
-      setNewPlace({ name: '', address: '', city: '', district: '', category: '' });
+      setSuccessMessage(data.message || '景點已提交審核，審核通過後將自動認領給您');
+      setNewPlace({
+        placeName: '',
+        district: '',
+        city: '',
+        country: '台灣',
+        address: '',
+        category: '',
+        description: '',
+      });
       setShowNewPlaceForm(false);
+      // 3 秒後關閉對話框
+      setTimeout(() => {
+        setSuccessMessage('');
+        setOpen(false);
+        onSuccess?.();
+      }, 3000);
     },
   });
 
@@ -98,20 +115,21 @@ export function PlaceClaimModal({
     if (searchQuery.trim().length >= 2) {
       setActiveSearch(searchQuery.trim());
       setShowNewPlaceForm(false);
+      setSuccessMessage('');
     }
   };
 
-  const handleClaim = (placeId: number) => {
+  const handleClaim = (placeCacheId: number) => {
     if (!canAddMore) {
       alert('已達景點數量上限，請升級方案');
       return;
     }
-    claimMutation.mutate(placeId);
+    claimMutation.mutate(placeCacheId);
   };
 
   const handleCreatePlace = () => {
-    if (!newPlace.name || !newPlace.address || !newPlace.city || !newPlace.category) {
-      alert('請填寫必要欄位');
+    if (!newPlace.placeName || !newPlace.city || !newPlace.district) {
+      alert('請填寫必要欄位（景點名稱、城市、區域）');
       return;
     }
     if (!canAddMore) {
@@ -136,7 +154,7 @@ export function PlaceClaimModal({
         <DialogHeader>
           <DialogTitle>認領或新增景點</DialogTitle>
           <DialogDescription>
-            搜尋現有景點進行認領，或新增您自己的景點。
+            搜尋現有景點進行認領，或新增您自己的景點（需審核）。
             {maxPlaces !== Infinity && (
               <span className="block mt-1 text-sm">
                 目前已認領 {currentPlacesCount} / {maxPlaces} 個景點
@@ -146,12 +164,22 @@ export function PlaceClaimModal({
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
+          {/* 成功訊息 */}
+          {successMessage && (
+            <Alert className="bg-green-50 border-green-200">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                {successMessage}
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* 搜尋區塊 */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="搜尋景點名稱或地址..."
+                placeholder="搜尋景點名稱..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -213,7 +241,7 @@ export function PlaceClaimModal({
           {showNewPlaceForm && (
             <div className="border rounded-lg p-4 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium">新增景點</h4>
+                <h4 className="font-medium">新增景點（需審核）</h4>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -223,21 +251,28 @@ export function PlaceClaimModal({
                 </Button>
               </div>
 
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  新增的景點需要經過審核，審核通過後將自動認領給您。
+                </AlertDescription>
+              </Alert>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="name">景點名稱 *</Label>
+                  <Label htmlFor="placeName">景點名稱 *</Label>
                   <Input
-                    id="name"
-                    value={newPlace.name}
+                    id="placeName"
+                    value={newPlace.placeName}
                     onChange={(e) =>
-                      setNewPlace({ ...newPlace, name: e.target.value })
+                      setNewPlace({ ...newPlace, placeName: e.target.value })
                     }
                     placeholder="例：星巴克信義店"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">類別 *</Label>
+                  <Label htmlFor="category">類別</Label>
                   <Select
                     value={newPlace.category}
                     onValueChange={(value) =>
@@ -265,12 +300,12 @@ export function PlaceClaimModal({
                     onChange={(e) =>
                       setNewPlace({ ...newPlace, city: e.target.value })
                     }
-                    placeholder="例：台北"
+                    placeholder="例：台北市"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="district">區域</Label>
+                  <Label htmlFor="district">區域 *</Label>
                   <Input
                     id="district"
                     value={newPlace.district}
@@ -282,14 +317,26 @@ export function PlaceClaimModal({
                 </div>
 
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="address">地址 *</Label>
+                  <Label htmlFor="address">地址</Label>
                   <Input
                     id="address"
                     value={newPlace.address}
                     onChange={(e) =>
                       setNewPlace({ ...newPlace, address: e.target.value })
                     }
-                    placeholder="完整地址"
+                    placeholder="完整地址（選填）"
+                  />
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="description">描述</Label>
+                  <Input
+                    id="description"
+                    value={newPlace.description}
+                    onChange={(e) =>
+                      setNewPlace({ ...newPlace, description: e.target.value })
+                    }
+                    placeholder="簡單描述此景點（選填）"
                   />
                 </div>
               </div>
@@ -302,10 +349,10 @@ export function PlaceClaimModal({
                 {createMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    新增中...
+                    提交中...
                   </>
                 ) : (
-                  '確認新增'
+                  '提交審核'
                 )}
               </Button>
             </div>
