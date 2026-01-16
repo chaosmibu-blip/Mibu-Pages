@@ -37,6 +37,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 「同步官網與 WEB 契約」 | 讀取後端契約，更新官網型別定義 |
 | 「審計架構一致性」 | 比對官網與後端的 API 差異 |
 | 「同步專案記憶」 | 更新 CLAUDE.md 確保與現況一致 |
+| 「檢查後端同步清單」 | 讀取 `docs/sync-web.md` 執行同步指令 |
+
+---
+
+## 三端協作 🔗
+
+Mibu 產品由三個獨立專案組成，後端是唯一真相來源。
+
+### 專案倉庫
+
+| 專案 | 倉庫 | 職責 |
+|------|------|------|
+| **後端** | [MIBU_REPLIT](https://github.com/chaosmibu-blip/MIBU_REPLIT) | API、資料庫、契約制定 |
+| **APP** | [mibu-app](https://github.com/chaosmibu-blip/mibu-app) | 扭蛋、行程規劃、收藏 |
+| **官網** | [Mibu-Pages](https://github.com/chaosmibu-blip/Mibu-Pages) | SEO、商家訂閱 |
+
+### 同步機制
+
+```
+後端完成 API 變更
+    ↓
+更新 docs/contracts/*.md（契約）
+    ↓
+更新 docs/sync-web.md 或 docs/sync-app.md（同步指令）
+    ↓
+官網/APP 讀取同步指令並執行
+    ↓
+回報完成狀態到 docs/sync-backend.md
+```
+
+### 協作規範
+
+- **契約位置**: 後端 `docs/contracts/`
+- **同步指令**: 後端 `docs/sync-web.md`（官網用）
+- **完成回報**: 官網 `docs/sync-backend.md`
 
 ---
 
@@ -234,6 +269,29 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 - 所有頁面需響應式（手機優先）
 - SEO 頁面使用 SSG + ISR
 - 商家頁面需認證保護
+
+---
+
+## 強制查閱規則 ⚡
+
+執行任何修改前，**必須先讀取對應記憶庫檔案**：
+
+| 修改範圍 | 必讀記憶庫 |
+|----------|------------|
+| SEO 頁面（城市、景點、行程） | `docs/memory-seo-pages.md` |
+| 商家後台（登入、訂閱、退款） | `docs/memory-merchant-portal.md` |
+| 共用元件（UI、Layout） | `docs/memory-components.md` |
+| API 型別定義 | 後端 `docs/contracts/WEB.md` |
+| 錯誤處理 | 後端 `docs/contracts/COMMON.md` |
+
+### 同步指令執行
+
+收到「檢查後端同步清單」指令時：
+
+1. 讀取後端 `docs/sync-web.md`
+2. 執行所有待完成任務
+3. 更新 `docs/sync-backend.md` 回報狀態
+4. Commit + Push
 
 ## 網域
 
