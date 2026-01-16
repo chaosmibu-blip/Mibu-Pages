@@ -8,6 +8,9 @@ import { get, post, patch, del, put } from './index';
 
 // ============ 類型定義 ============
 
+/** 商家等級（依照 WEB 契約 v1.0.0） */
+export type MerchantLevel = 'free' | 'pro' | 'premium' | 'partner';
+
 /** 商家資料 */
 export interface Merchant {
   id: number;
@@ -16,8 +19,8 @@ export interface Merchant {
   businessEmail: string;
   businessPhone?: string;
   businessAddress?: string;
-  /** 商家等級（與後端 schema 同步：free/pro/premium） */
-  merchantLevel: 'free' | 'pro' | 'premium';
+  /** 商家等級（與後端契約同步） */
+  merchantLevel: MerchantLevel;
   merchantLevelExpiresAt?: string;
   maxPlaces: number;
   maxCoupons: number;
@@ -85,7 +88,7 @@ export interface MerchantPlace {
   googleMapUrl: string | null;
   openingHours: { weekdayText?: string[]; periods?: unknown[] } | null;
   status: 'pending' | 'approved' | 'rejected';
-  cardLevel: 'free' | 'pro' | 'premium';
+  cardLevel: MerchantLevel;
   promoTitle: string | null;
   promoDescription: string | null;
   inventoryImageUrl: string | null;
@@ -207,7 +210,7 @@ export interface CheckoutResponse {
 /** 商家權限回應 */
 export interface MerchantPermissions {
   merchantId: number;
-  currentTier: 'free' | 'pro' | 'premium';
+  currentTier: MerchantLevel;
   limits: {
     maxPlaces: number;
     maxCoupons: number;
