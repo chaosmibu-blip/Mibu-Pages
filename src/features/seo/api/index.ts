@@ -5,7 +5,7 @@
  */
 
 // 城市
-export { getCities, getCityDetail, getRelatedCities } from './cities';
+export { getCities, getCityDetail, getRelatedCities, getCityDistricts } from './cities';
 
 // 景點
 export { getPlaceById, getAllPlaceIds } from './places';
