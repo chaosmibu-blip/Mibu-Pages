@@ -73,7 +73,7 @@ export {
 // ============ 組件 ============
 export { JsonLdScript, Breadcrumb, SeoPageHeader } from './components';
 
-// ============ API 資料獲取 ============
+// ============ API 資料獲取（依照 WEB 契約 v1.0.0） ============
 export {
   // 城市
   getCities,
@@ -81,8 +81,12 @@ export {
   getRelatedCities,
   getCityDistricts,
   // 景點
+  getPlaces,
   getPlaceById,
+  getPlaceBySlug,
   getAllPlaceIds,
+  // 行政區
+  getDistrictDetail,
   // 行程
   getTrips,
   getTripsByCity,

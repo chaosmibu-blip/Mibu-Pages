@@ -214,7 +214,47 @@ export interface TripsResponse {
 
 export interface District {
   name: string;
+  slug?: string;
   tripCount: number;
+  placeCount?: number;
+}
+
+/** 行政區詳情回應 - GET /api/seo/districts/:citySlug/:districtSlug */
+export interface DistrictDetailResponse {
+  district: {
+    name: string;
+    slug: string;
+    city: string;
+    citySlug: string;
+    country: string;
+    placeCount: number;
+    tripCount: number;
+  };
+  places: PlaceInCity[];
+  pagination: Pagination;
+}
+
+// ============ 景點列表相關 ============
+
+/** 景點列表查詢參數 - GET /api/seo/places */
+export interface PlacesQueryParams {
+  city?: string;
+  district?: string;
+  category?: string;
+  q?: string;  // 搜尋關鍵字
+  page?: number;
+  limit?: number;
+}
+
+/** 景點列表回應 - GET /api/seo/places */
+export interface PlacesResponse {
+  places: PlaceInCity[];
+  pagination: Pagination;
+  filters?: {
+    cities: string[];
+    districts: string[];
+    categories: string[];
+  };
 }
 
 // ============ 分類相關（未來擴展） ============

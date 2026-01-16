@@ -1,7 +1,8 @@
 /**
  * 錯誤碼常數
  *
- * 與後端 shared/errors.ts 同步
+ * 依照 COMMON 契約 v1.0.0 同步
+ * 來源：後端 shared/errors.ts
  * 用於精確的錯誤處理和使用者提示
  */
 
