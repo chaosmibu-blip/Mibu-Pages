@@ -155,7 +155,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const cityPages = cities.map((city) => ({
-    url: `${baseUrl}/city/${city.slug}`,
+    url: `${baseUrl}/city/${encodeURIComponent(city.slug)}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
     priority: 0.8,

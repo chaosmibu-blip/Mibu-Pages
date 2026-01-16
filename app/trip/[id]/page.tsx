@@ -41,6 +41,22 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+// 動態產生行程詳情頁面的靜態參數
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${API_URL}/api/seo/trips`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const trips: Trip[] = Array.isArray(data) ? data : (data.trips || []);
+
+    return trips.map((trip) => ({ id: String(trip.id) }));
+  } catch {
+    return [];
+  }
+}
+
 async function getTripDetail(id: string): Promise<TripDetail | null> {
   try {
     const res = await fetch(`${API_URL}/api/seo/trips/${id}`, {

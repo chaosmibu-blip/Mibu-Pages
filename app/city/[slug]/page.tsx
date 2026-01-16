@@ -72,9 +72,35 @@ async function getCity(slug: string): Promise<CityData | null> {
   }
 }
 
+// 與 sitemap.ts 共用的 fallback，確保一致性
+const STATIC_CITY_SLUGS = ["taipei", "tokyo", "osaka", "kyoto", "seoul", "bangkok"];
+
 export async function generateStaticParams() {
-  const slugs = ["taipei", "tokyo", "osaka", "kyoto", "seoul", "bangkok"];
-  return slugs.map((slug) => ({ slug }));
+  try {
+    const res = await fetch(`${API_URL}/api/seo/cities`);
+    if (!res.ok) {
+      return STATIC_CITY_SLUGS.map((slug) => ({ slug }));
+    }
+    const data = await res.json();
+
+    // 支援多種 API 回應格式
+    let cities: { slug: string }[] = [];
+    if (Array.isArray(data)) {
+      cities = data;
+    } else if (data?.cities && Array.isArray(data.cities)) {
+      cities = data.cities;
+    } else if (data?.data && Array.isArray(data.data)) {
+      cities = data.data;
+    }
+
+    if (cities.length === 0) {
+      return STATIC_CITY_SLUGS.map((slug) => ({ slug }));
+    }
+
+    return cities.map((city) => ({ slug: city.slug }));
+  } catch {
+    return STATIC_CITY_SLUGS.map((slug) => ({ slug }));
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
