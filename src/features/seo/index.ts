@@ -79,6 +79,7 @@ export {
   getCities,
   getCityDetail,
   getRelatedCities,
+  getCityDistricts,
   // 景點
   getPlaceById,
   getAllPlaceIds,

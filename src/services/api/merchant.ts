@@ -16,7 +16,8 @@ export interface Merchant {
   businessEmail: string;
   businessPhone?: string;
   businessAddress?: string;
-  merchantLevel: 'free' | 'basic' | 'pro' | 'premium' | 'partner';
+  /** 商家等級（與後端 schema 同步：free/pro/premium） */
+  merchantLevel: 'free' | 'pro' | 'premium';
   merchantLevelExpiresAt?: string;
   maxPlaces: number;
   maxCoupons: number;
@@ -175,19 +176,66 @@ export interface CreateCouponRequest {
   usageLimit?: number;
 }
 
-/** 結帳請求 */
+/** 結帳請求（與後端同步） */
 export interface CheckoutRequest {
-  tier: 'basic' | 'pro' | 'premium';
+  /** 訂閱類型：商家訂閱或景點訂閱 */
+  type: 'merchant' | 'place';
+  /** 訂閱等級 */
+  tier: 'pro' | 'premium' | 'partner';
+  /** 支付提供商 */
   provider: 'stripe' | 'recur';
-  billingCycle?: 'monthly' | 'yearly';
-  successUrl?: string;
-  cancelUrl?: string;
+  /** 付款成功後跳轉 URL */
+  successUrl: string;
+  /** 付款取消後跳轉 URL */
+  cancelUrl: string;
 }
 
-/** 結帳回應 */
+/** 結帳回應（支援 Stripe 和 Recur 兩種格式） */
 export interface CheckoutResponse {
-  checkoutUrl: string;
-  sessionId: string;
+  // Stripe 格式
+  /** Stripe 結帳頁面 URL */
+  checkoutUrl?: string;
+  /** Stripe Checkout URL（別名） */
+  url?: string;
+  // Recur 格式
+  /** Recur 產品 ID */
+  productId?: string;
+  /** Recur 公開金鑰 */
+  publishableKey?: string;
+}
+
+/** 商家權限回應 */
+export interface MerchantPermissions {
+  merchantId: number;
+  currentTier: 'free' | 'pro' | 'premium';
+  limits: {
+    maxPlaces: number;
+    maxCoupons: number;
+    analyticsEnabled: boolean;
+    prioritySupport: boolean;
+  };
+  tierLimits: Record<string, {
+    maxPlaces: number;
+    maxCoupons: number;
+    analyticsEnabled: boolean;
+    prioritySupport: boolean;
+  }>;
+}
+
+/** 認領景點請求（完整參數） */
+export interface ClaimPlaceRequest {
+  /** PlaceCache ID（優先使用） */
+  placeCacheId?: number;
+  /** Google Place ID（可選） */
+  googlePlaceId?: string;
+  /** 景點名稱（當沒有 placeCacheId 時必填） */
+  placeName?: string;
+  /** 區域 */
+  district?: string;
+  /** 城市 */
+  city?: string;
+  /** 國家 */
+  country?: string;
 }
 
 // ============ API 方法 ============
@@ -225,10 +273,13 @@ export const merchantApi = {
     get<{ places: ClaimablePlace[] }>(`/api/merchant/places/search?query=${encodeURIComponent(query)}`),
 
   /**
-   * 認領景點
+   * 認領景點（支援完整參數）
    */
-  claimPlace: (placeCacheId: number) =>
-    post<{ success: boolean; link: MerchantPlace }>('/api/merchant/places/claim', { placeCacheId }),
+  claimPlace: (params: ClaimPlaceRequest | number) => {
+    // 向後相容：支援只傳 placeCacheId
+    const body = typeof params === 'number' ? { placeCacheId: params } : params;
+    return post<{ success: boolean; link: MerchantPlace }>('/api/merchant/places/claim', body);
+  },
 
   /**
    * 新增自有景點（待審核）
@@ -300,6 +351,21 @@ export const merchantApi = {
     post<{ success: boolean; message: string }>('/api/merchant/subscription/cancel', {
       subscriptionId,
     }),
+
+  /**
+   * 升級訂閱
+   */
+  upgradeSubscription: (subscriptionId: number, newTier: 'pro' | 'premium' | 'partner') =>
+    post<{ billingPortalUrl: string }>('/api/merchant/subscription/upgrade', {
+      subscriptionId,
+      newTier,
+    }),
+
+  /**
+   * 取得商家權限與限制
+   */
+  getPermissions: () =>
+    get<MerchantPermissions>('/api/merchant/permissions'),
 
   /**
    * 檢查退款資格

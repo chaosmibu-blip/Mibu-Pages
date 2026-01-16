@@ -3,7 +3,7 @@
  */
 
 import { API_URL } from '@/lib/config';
-import type { CitiesResponse, CityDetailResponse, RelatedCitiesResponse, City } from '../types';
+import type { CitiesResponse, CityDetailResponse, RelatedCitiesResponse, City, District } from '../types';
 
 const REVALIDATE_TIME = 3600; // 1 小時
 
@@ -66,5 +66,22 @@ export async function getRelatedCities(slug: string): Promise<RelatedCitiesRespo
     return res.json();
   } catch {
     return null;
+  }
+}
+
+/**
+ * 取得城市內的行政區列表
+ * GET /api/seo/cities/:slug/districts
+ */
+export async function getCityDistricts(slug: string): Promise<District[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/seo/cities/${encodeURIComponent(slug)}/districts`, {
+      next: { revalidate: REVALIDATE_TIME },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.districts || [];
+  } catch {
+    return [];
   }
 }
