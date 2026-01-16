@@ -20,6 +20,35 @@ interface Props {
   params: Promise<{ city: string; district: string }>;
 }
 
+// 動態產生區域行程頁面的靜態參數
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${API_URL}/api/seo/trips`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const trips: Trip[] = Array.isArray(data) ? data : (data.trips || []);
+
+    // 取得不重複的城市+區域組合
+    const cityDistrictPairs = [...new Set(
+      trips
+        .filter((t) => t.city && t.district)
+        .map((t) => `${t.city}|${t.district}`)
+    )];
+
+    return cityDistrictPairs.map((pair) => {
+      const [city, district] = pair.split("|");
+      return {
+        city: encodeURIComponent(city),
+        district: encodeURIComponent(district),
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 async function getTripsByCityAndDistrict(city: string, district: string): Promise<Trip[]> {
   try {
     const res = await fetch(

@@ -21,6 +21,24 @@ interface Props {
   params: Promise<{ city: string }>;
 }
 
+// 動態產生城市行程頁面的靜態參數
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${API_URL}/api/seo/trips`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const trips: Trip[] = Array.isArray(data) ? data : (data.trips || []);
+
+    // 取得不重複的城市列表
+    const cities = [...new Set(trips.map((t) => t.city).filter(Boolean))];
+    return cities.map((city) => ({ city: encodeURIComponent(city) }));
+  } catch {
+    return [];
+  }
+}
+
 async function getTripsByCity(city: string): Promise<Trip[]> {
   try {
     const res = await fetch(`${API_URL}/api/seo/trips?city=${encodeURIComponent(city)}`, {

@@ -76,9 +76,36 @@ async function getPlace(id: string): Promise<PlaceData | null> {
   }
 }
 
+// 與 sitemap.ts 共用的 fallback，確保一致性
+const STATIC_PLACE_IDS = ["taipei-101", "shilin-night-market", "national-palace-museum", "sensoji", "shibuya-crossing", "meiji-shrine"];
+
 export async function generateStaticParams() {
-  const ids = ["taipei-101", "shilin-night-market", "national-palace-museum", "sensoji", "shibuya-crossing", "meiji-shrine"];
-  return ids.map((id) => ({ id }));
+  try {
+    const res = await fetch(`${API_URL}/api/seo/places`);
+    if (!res.ok) {
+      return STATIC_PLACE_IDS.map((id) => ({ id }));
+    }
+    const data = await res.json();
+
+    // 支援多種 API 回應格式
+    let places: { id: string | number }[] = [];
+    if (Array.isArray(data)) {
+      places = data;
+    } else if (data?.places && Array.isArray(data.places)) {
+      places = data.places;
+    } else if (data?.data && Array.isArray(data.data)) {
+      places = data.data;
+    }
+
+    if (places.length === 0) {
+      return STATIC_PLACE_IDS.map((id) => ({ id }));
+    }
+
+    // 確保 id 轉為字串（後端可能回傳數字）
+    return places.map((place) => ({ id: String(place.id) }));
+  } catch {
+    return STATIC_PLACE_IDS.map((id) => ({ id }));
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
