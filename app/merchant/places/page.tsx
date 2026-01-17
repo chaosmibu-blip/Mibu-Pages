@@ -189,7 +189,7 @@ function PlacesContent() {
                 </span>
               </div>
               <Link href="/merchant/places/new">
-                <Button variant="link" size="sm" className="p-0 h-auto">
+                <Button variant="ghost" size="sm">
                   新增景點
                 </Button>
               </Link>
