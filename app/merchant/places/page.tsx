@@ -22,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, ArrowUpRight, Loader2 } from 'lucide-react';
+import { MapPin, ArrowUpRight, Loader2, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 function PlacesContent() {
@@ -168,15 +168,32 @@ function PlacesContent() {
           )}
 
           {/* 提示訊息 */}
-          <div className="pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              認領景點後，您可以：
-            </p>
-            <ul className="text-sm text-muted-foreground mt-2 space-y-1 list-disc list-inside">
-              <li>設定專屬優惠資訊，吸引更多顧客</li>
-              <li>在 Mibu App 中優先曝光</li>
-              <li>查看景點瀏覽數據（升級方案後）</li>
-            </ul>
+          <div className="pt-4 border-t space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                認領景點後，您可以：
+              </p>
+              <ul className="text-sm text-muted-foreground mt-2 space-y-1 list-disc list-inside">
+                <li>設定專屬優惠資訊，吸引更多顧客</li>
+                <li>在 Mibu App 中優先曝光</li>
+                <li>查看景點瀏覽數據（升級方案後）</li>
+              </ul>
+            </div>
+
+            {/* 新增景點入口 */}
+            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center gap-2">
+                <PlusCircle className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  找不到您的店家？
+                </span>
+              </div>
+              <Link href="/merchant/places/new">
+                <Button variant="link" size="sm" className="p-0 h-auto">
+                  新增景點
+                </Button>
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>
