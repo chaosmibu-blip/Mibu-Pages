@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Loader2, Plus, X, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Loader2, Plus, X, AlertCircle, Clock, Phone, Globe } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -31,14 +31,35 @@ interface PlaceClaimModalProps {
   currentPlacesCount?: number;
 }
 
+// 七大分類（依照 WEB 契約 v1.2.0）
 const categories = [
   '美食',
-  '咖啡廳',
-  '景點',
   '住宿',
+  '景點',
   '購物',
-  '交通',
-  '其他',
+  '娛樂設施',
+  '生態文化教育',
+  '遊程體驗',
+];
+
+// 星期列表
+const WEEKDAYS = [
+  '星期一',
+  '星期二',
+  '星期三',
+  '星期四',
+  '星期五',
+  '星期六',
+  '星期日',
+];
+
+// 營業時間選項
+const TIME_OPTIONS = [
+  '00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
+  '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
+  '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
+  '18:00', '19:00', '20:00', '21:00', '22:00', '23:00',
+  '24:00',
 ];
 
 export function PlaceClaimModal({
@@ -53,13 +74,18 @@ export function PlaceClaimModal({
   const [successMessage, setSuccessMessage] = useState('');
   const [newPlace, setNewPlace] = useState<CreatePlaceRequest>({
     placeName: '',
-    district: '',
-    city: '',
-    country: '台灣',
     address: '',
+    city: '',
+    district: '',
     category: '',
     description: '',
+    phone: '',
+    website: '',
   });
+  const [showOpeningHours, setShowOpeningHours] = useState(false);
+  const [openingHoursText, setOpeningHoursText] = useState<string[]>(
+    WEEKDAYS.map(() => '')
+  );
 
   const queryClient = useQueryClient();
 
@@ -88,19 +114,30 @@ export function PlaceClaimModal({
 
   // 新增自有景點（待審核）
   const createMutation = useMutation({
-    mutationFn: () => merchantApi.createPlace(newPlace),
+    mutationFn: () => {
+      // 組裝營業時間
+      const weekdayText = openingHoursText.filter((t) => t.trim() !== '');
+      const placeData: CreatePlaceRequest = {
+        ...newPlace,
+        openingHours: weekdayText.length > 0 ? { weekdayText } : undefined,
+      };
+      return merchantApi.createPlace(placeData);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['merchantPlaces'] });
       setSuccessMessage(data.message || '景點已提交審核，審核通過後將自動認領給您');
       setNewPlace({
         placeName: '',
-        district: '',
-        city: '',
-        country: '台灣',
         address: '',
+        city: '',
+        district: '',
         category: '',
         description: '',
+        phone: '',
+        website: '',
       });
+      setOpeningHoursText(WEEKDAYS.map(() => ''));
+      setShowOpeningHours(false);
       setShowNewPlaceForm(false);
       // 3 秒後關閉對話框
       setTimeout(() => {
@@ -128,8 +165,8 @@ export function PlaceClaimModal({
   };
 
   const handleCreatePlace = () => {
-    if (!newPlace.placeName || !newPlace.city || !newPlace.district) {
-      alert('請填寫必要欄位（景點名稱、城市、區域）');
+    if (!newPlace.placeName || !newPlace.address || !newPlace.city || !newPlace.category) {
+      alert('請填寫必要欄位（景點名稱、地址、城市、類別）');
       return;
     }
     if (!canAddMore) {
@@ -137,6 +174,13 @@ export function PlaceClaimModal({
       return;
     }
     createMutation.mutate();
+  };
+
+  // 更新營業時間文字
+  const handleOpeningHourChange = (dayIndex: number, value: string) => {
+    const newHours = [...openingHoursText];
+    newHours[dayIndex] = value;
+    setOpeningHoursText(newHours);
   };
 
   const isLoading = claimMutation.isPending || createMutation.isPending;
@@ -272,7 +316,7 @@ export function PlaceClaimModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">類別</Label>
+                  <Label htmlFor="category">類別 *</Label>
                   <Select
                     value={newPlace.category}
                     onValueChange={(value) =>
@@ -305,7 +349,7 @@ export function PlaceClaimModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="district">區域 *</Label>
+                  <Label htmlFor="district">區域</Label>
                   <Input
                     id="district"
                     value={newPlace.district}
@@ -317,14 +361,14 @@ export function PlaceClaimModal({
                 </div>
 
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="address">地址</Label>
+                  <Label htmlFor="address">地址 *</Label>
                   <Input
                     id="address"
                     value={newPlace.address}
                     onChange={(e) =>
                       setNewPlace({ ...newPlace, address: e.target.value })
                     }
-                    placeholder="完整地址（選填）"
+                    placeholder="完整地址"
                   />
                 </div>
 
@@ -338,6 +382,104 @@ export function PlaceClaimModal({
                     }
                     placeholder="簡單描述此景點（選填）"
                   />
+                </div>
+
+                {/* Phase 6: 電話欄位 */}
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="flex items-center gap-1">
+                    <Phone className="h-3.5 w-3.5" />
+                    電話
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={newPlace.phone || ''}
+                    onChange={(e) =>
+                      setNewPlace({ ...newPlace, phone: e.target.value })
+                    }
+                    placeholder="例：02-1234-5678"
+                  />
+                </div>
+
+                {/* Phase 6: 網站欄位 */}
+                <div className="space-y-2">
+                  <Label htmlFor="website" className="flex items-center gap-1">
+                    <Globe className="h-3.5 w-3.5" />
+                    網站
+                  </Label>
+                  <Input
+                    id="website"
+                    type="url"
+                    value={newPlace.website || ''}
+                    onChange={(e) =>
+                      setNewPlace({ ...newPlace, website: e.target.value })
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                {/* Phase 6: 營業時間選擇器 */}
+                <div className="space-y-2 sm:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" />
+                      營業時間
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowOpeningHours(!showOpeningHours)}
+                    >
+                      {showOpeningHours ? '收起' : '展開設定'}
+                    </Button>
+                  </div>
+
+                  {showOpeningHours && (
+                    <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground mb-2">
+                        填寫每天的營業時間，例如「09:00–21:00」或「休息」
+                      </p>
+                      {WEEKDAYS.map((day, index) => (
+                        <div key={day} className="flex items-center gap-2">
+                          <span className="w-16 text-sm text-muted-foreground">
+                            {day}
+                          </span>
+                          <Input
+                            value={openingHoursText[index]}
+                            onChange={(e) =>
+                              handleOpeningHourChange(index, e.target.value)
+                            }
+                            placeholder="09:00–21:00"
+                            className="flex-1"
+                          />
+                        </div>
+                      ))}
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const defaultHours = '09:00–21:00';
+                            setOpeningHoursText(WEEKDAYS.map(() => defaultHours));
+                          }}
+                        >
+                          套用預設（09:00–21:00）
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setOpeningHoursText(WEEKDAYS.map(() => ''));
+                          }}
+                        >
+                          清除全部
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
