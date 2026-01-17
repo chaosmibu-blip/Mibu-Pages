@@ -137,6 +137,7 @@ app/                    # Next.js App Router 頁面
 │   ├── login/          # 商家登入（Google/Apple OAuth）
 │   ├── dashboard/      # 儀表板
 │   ├── places/         # 景點管理（Phase 6 更新）
+│   │   └── new/        # 新增景點頁面（#005）
 │   ├── subscribe/      # 結帳頁面
 │   └── subscription/   # 我的訂閱（唯讀）
 ├── privacy/            # 隱私權政策
@@ -201,6 +202,8 @@ shared/
 | `/for-business` | 靜態 |
 | `/for-business/pricing` | CSR |
 | `/merchant/login` | CSR |
+| `/merchant/places` | CSR (需認證) |
+| `/merchant/places/new` | CSR (需認證) |
 | `/merchant/subscription` | CSR (需認證) |
 | `/merchant/subscribe` | CSR (需認證) |
 
@@ -219,6 +222,8 @@ shared/
 | 功能 | 說明 |
 |------|------|
 | 登入 | Google/Apple OAuth，非商家帳號顯示錯誤引導下載 App |
+| 景點管理 | 認領已有景點或新增自有景點（需審核） |
+| 新增景點 | 填寫基本資訊、聯絡方式、營業時間，提交審核 |
 | 訂閱購買 | 選擇方案 → 登入 → 結帳（Stripe/Recur 雙軌金流） |
 | 查看訂閱 | 顯示方案、狀態、到期日、配額 |
 | 取消訂閱 | 在訂閱管理頁面點擊取消，服務持續至當期結束 |
