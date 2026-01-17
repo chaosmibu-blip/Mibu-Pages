@@ -6,6 +6,61 @@
 
 ## 最新回報
 
+### #004 後端 CLAUDE.md v2.0 更新同步
+
+- **指令來源**: `docs/sync-web.md`
+- **執行時間**: 2026-01-17
+- **狀態**: ✅ 已完成
+
+#### 完成項目
+
+- [x] 更新 CLAUDE.md 專案結構（加入 crowdfund 模組）
+- [x] 更新 WEB 契約版本號至 v1.2.0
+- [x] 加入募資系統文檔段落
+- [x] 交叉參考後端文檔變更
+
+#### 異常回報
+
+無
+
+---
+
+### #003 Phase 2 & 6 API 實作
+
+- **指令來源**: `docs/sync-web.md`
+- **執行時間**: 2026-01-17
+- **狀態**: ✅ 已完成
+
+#### Phase 2 募資系統完成項目
+
+- [x] 建立 `src/features/crowdfund/` 模組
+  - [x] `types/index.ts` - 型別定義
+  - [x] `api/index.ts` - API 層
+  - [x] `index.ts` - 模組匯出
+- [x] 建立 `app/crowdfund/` 頁面
+  - [x] `page.tsx` - 募資活動列表
+  - [x] `[id]/page.tsx` - 募資詳情 + Stripe 結帳
+  - [x] `my-contributions/page.tsx` - 我的贊助紀錄
+
+#### Phase 6 商家表單更新完成項目
+
+- [x] 更新 `src/services/api/merchant.ts`
+  - [x] 新增 `OpeningHours` 型別
+  - [x] 更新 `CreatePlaceRequest` 加入 openingHours, phone, website
+  - [x] 更新 `MerchantPlace` 加入 phone, website
+  - [x] 更新 `UpdateMerchantPlaceParams` 加入 phone, website
+- [x] 更新 `src/components/merchant/PlaceClaimModal.tsx`
+  - [x] 新增營業時間選擇器（週一至週日）
+  - [x] 新增電話欄位
+  - [x] 新增網站欄位
+  - [x] 更新七大分類列表
+
+#### 異常回報
+
+無
+
+---
+
 ### #002 文件清理
 
 - **指令來源**: `docs/sync-web.md`
@@ -61,5 +116,7 @@
 
 | 日期 | 指令編號 | 狀態 | 備註 |
 |------|----------|------|------|
+| 2026-01-17 | #004 | ✅ | 後端 CLAUDE.md v2.0 更新同步 |
+| 2026-01-17 | #003 | ✅ | Phase 2 & 6 API 實作 |
 | 2026-01-16 | #002 | ✅ | 文件清理 |
 | 2026-01-16 | #001 | ✅ | 架構升級 - 三端協作規範 |

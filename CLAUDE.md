@@ -128,10 +128,15 @@ app/                    # Next.js App Router 頁面
 ├── trips/[city]/       # 城市行程頁 (SSG + ISR)
 ├── trips/[city]/[district]/ # 區域行程頁 (SSG + ISR)
 ├── trip/[id]/          # 行程詳情頁 (SSG + ISR)
+├── crowdfund/          # 募資系統（WEB v1.2.0 新增）
+│   ├── page.tsx        # 募資活動列表
+│   ├── [id]/           # 募資詳情 + 贊助
+│   └── my-contributions/ # 我的贊助紀錄
 ├── for-business/       # 商家合作頁面
 ├── merchant/           # 商家登入/後台
 │   ├── login/          # 商家登入（Google/Apple OAuth）
 │   ├── dashboard/      # 儀表板
+│   ├── places/         # 景點管理（Phase 6 更新）
 │   ├── subscribe/      # 結帳頁面
 │   └── subscription/   # 我的訂閱（唯讀）
 ├── privacy/            # 隱私權政策
@@ -145,16 +150,19 @@ src/
 ├── constants/
 │   └── errorCodes.ts   # 錯誤碼常數（依照 COMMON 契約）
 ├── features/
-│   └── seo/            # SEO 模組化架構（程式化 SEO 用）
-│       ├── api/        # API 資料獲取層（依照 WEB 契約）
-│       ├── metadata/   # Metadata 產生器
-│       ├── jsonLd/     # JSON-LD 結構化資料產生器
-│       ├── components/ # SEO 專用組件（Breadcrumb, JsonLdScript）
-│       └── types/      # 型別定義（依照 WEB 契約）
+│   ├── seo/            # SEO 模組化架構（程式化 SEO 用）
+│   │   ├── api/        # API 資料獲取層（依照 WEB 契約）
+│   │   ├── metadata/   # Metadata 產生器
+│   │   ├── jsonLd/     # JSON-LD 結構化資料產生器
+│   │   ├── components/ # SEO 專用組件（Breadcrumb, JsonLdScript）
+│   │   └── types/      # 型別定義（依照 WEB 契約）
+│   └── crowdfund/      # 募資系統模組（WEB v1.2.0 新增）
+│       ├── api/        # API 層
+│       └── types/      # 型別定義
 ├── services/
 │   └── api/
 │       ├── index.ts    # 通用 API 請求處理
-│       └── merchant.ts # 商家 API（依照 WEB 契約）
+│       └── merchant.ts # 商家 API（依照 WEB 契約 v1.2.0）
 ├── components/
 │   ├── ui/             # shadcn/ui 元件
 │   ├── layout/         # Header, Footer
@@ -310,9 +318,32 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 
 ---
 
+## 募資系統
+
+位於 `src/features/crowdfund/`，用於群眾募資功能。依照 WEB 契約 v1.2.0。
+
+### 頁面
+
+| 路由 | 用途 | 渲染方式 |
+|------|------|----------|
+| `/crowdfund` | 募資活動列表 | SSG + ISR |
+| `/crowdfund/[id]` | 募資活動詳情 + 贊助 | CSR |
+| `/crowdfund/my-contributions` | 我的贊助紀錄 | CSR (需認證) |
+
+### API 端點
+
+| 端點 | 用途 | 認證 |
+|------|------|------|
+| `GET /api/crowdfund/campaigns` | 活動列表 | 公開 |
+| `GET /api/crowdfund/campaigns/:id` | 活動詳情 | 公開 |
+| `POST /api/crowdfund/checkout` | 建立 Stripe 結帳 | 選填 |
+| `GET /api/crowdfund/my-contributions` | 我的贊助 | 必填 |
+
+---
+
 ## SEO 模組架構
 
-位於 `src/features/seo/`，用於程式化 SEO。依照 WEB 契約 v1.0.0。
+位於 `src/features/seo/`，用於程式化 SEO。依照 WEB 契約 v1.2.0。
 
 ### 使用方式
 
@@ -343,7 +374,7 @@ import {
 } from '@/features/seo';
 ```
 
-### SEO API 端點（依照 WEB 契約 v1.0.0）
+### SEO API 端點（依照 WEB 契約 v1.2.0）
 
 | 端點 | 用途 | 函數 |
 |------|------|------|

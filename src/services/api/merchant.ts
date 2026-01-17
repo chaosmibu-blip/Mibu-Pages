@@ -73,7 +73,13 @@ export interface RefundEligibility {
   };
 }
 
-/** 商家景點（已認領） */
+/** 營業時間格式（依照 WEB 契約 v1.2.0） */
+export interface OpeningHours {
+  weekdayText?: string[];   // ["星期一: 09:00–21:00", ...]
+  periods?: unknown[];      // Google Places API 格式
+}
+
+/** 商家景點（已認領）- 依照 WEB 契約 v1.2.0 */
 export interface MerchantPlace {
   id: number;
   merchantId: number;
@@ -86,7 +92,9 @@ export interface MerchantPlace {
   country: string;
   description: string | null;
   googleMapUrl: string | null;
-  openingHours: { weekdayText?: string[]; periods?: unknown[] } | null;
+  openingHours: OpeningHours | null;
+  phone: string | null;           // Phase 6 新增
+  website: string | null;         // Phase 6 新增
   status: 'pending' | 'approved' | 'rejected';
   cardLevel: MerchantLevel;
   promoTitle: string | null;
@@ -97,11 +105,13 @@ export interface MerchantPlace {
   updatedAt: string;
 }
 
-/** 更新景點參數 */
+/** 更新景點參數（依照 WEB 契約 v1.2.0） */
 export interface UpdateMerchantPlaceParams {
   description?: string;
   googleMapUrl?: string;
-  openingHours?: { weekdayText?: string[]; periods?: unknown[] };
+  openingHours?: OpeningHours;
+  phone?: string;                 // Phase 6 新增
+  website?: string;               // Phase 6 新增
   promoTitle?: string;
   promoDescription?: string;
   isPromoActive?: boolean;
@@ -123,19 +133,20 @@ export interface ClaimablePlace {
   createdAt: string;
 }
 
-/** 新增景點請求 */
+/** 新增景點請求（依照 WEB 契約 v1.2.0 - Phase 6） */
 export interface CreatePlaceRequest {
   placeName: string;
-  district: string;
+  address: string;
   city: string;
-  country: string;
-  address?: string;
-  category?: string;
+  district?: string;
+  category: string;               // 七大分類
   subcategory?: string;
   description?: string;
-  googlePlaceId?: string;
-  locationLat?: string;
-  locationLng?: string;
+  openingHours?: OpeningHours;    // Phase 6 新增
+  phone?: string;                 // Phase 6 新增
+  website?: string;               // Phase 6 新增
+  locationLat?: number;
+  locationLng?: number;
 }
 
 /** 新增景點回應（待審核） */
