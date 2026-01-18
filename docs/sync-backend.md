@@ -6,6 +6,34 @@
 
 ## 最新回報
 
+### #006 活動系統 API 實作
+
+- **指令來源**: `docs/sync-web.md`
+- **執行時間**: 2026-01-18
+- **狀態**: ✅ 已完成
+
+#### 完成項目
+
+- [x] 建立 `src/features/events/` 模組
+  - [x] `types/index.ts` - 型別定義（Event, EventType, EventStatus）
+  - [x] `api/index.ts` - API 層（getEvents, getActiveEvents）
+  - [x] `components/EventsSection.tsx` - 首頁活動區塊組件
+  - [x] `index.ts` - 模組匯出
+- [x] 活動類型支援
+  - [x] `announcement` - 公告
+  - [x] `festival` - 節慶
+  - [x] `limited` - 限時
+- [x] 調用 `GET /api/events` 端點
+- [x] 支援篩選參數（type, status, limit）
+- [x] Fallback 資料（API 不可用時使用）
+- [x] 更新 `app/page.tsx` 首頁整合活動區塊
+
+#### 異常回報
+
+無
+
+---
+
 ### #005 商家新增店家頁面
 
 - **指令來源**: `docs/sync-web.md`
@@ -152,6 +180,7 @@
 
 | 日期 | 指令編號 | 狀態 | 備註 |
 |------|----------|------|------|
+| 2026-01-18 | #006 | ✅ | 活動系統 API 實作 |
 | 2026-01-17 | #005 | ✅ | 商家新增店家頁面 |
 | 2026-01-17 | #004 | ✅ | 後端 CLAUDE.md v2.0 更新同步 |
 | 2026-01-17 | #003 | ✅ | Phase 2 & 6 API 實作 |
