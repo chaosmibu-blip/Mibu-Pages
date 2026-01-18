@@ -157,9 +157,13 @@ src/
 │   │   ├── jsonLd/     # JSON-LD 結構化資料產生器
 │   │   ├── components/ # SEO 專用組件（Breadcrumb, JsonLdScript）
 │   │   └── types/      # 型別定義（依照 WEB 契約）
-│   └── crowdfund/      # 募資系統模組（WEB v1.2.0 新增）
-│       ├── api/        # API 層
-│       └── types/      # 型別定義
+│   ├── crowdfund/      # 募資系統模組（WEB v1.2.0 新增）
+│   │   ├── api/        # API 層
+│   │   └── types/      # 型別定義
+│   └── events/         # 活動系統模組（#006）
+│       ├── api/        # API 層（getEvents, getActiveEvents）
+│       ├── types/      # 型別定義（Event, EventType）
+│       └── components/ # 組件（EventsSection）
 ├── services/
 │   └── api/
 │       ├── index.ts    # 通用 API 請求處理
@@ -187,7 +191,7 @@ shared/
 ### SEO 頁面（面向旅客）
 | 路由 | 渲染方式 |
 |------|----------|
-| `/` | 靜態 |
+| `/` | SSG + ISR (5min) |
 | `/explore` | SSG + ISR (1hr) |
 | `/city/[slug]` | SSG + ISR (1hr) |
 | `/place/[id]` | SSG + ISR (1hr) |
@@ -343,6 +347,40 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 | `GET /api/crowdfund/campaigns/:id` | 活動詳情 | 公開 |
 | `POST /api/crowdfund/checkout` | 建立 Stripe 結帳 | 選填 |
 | `GET /api/crowdfund/my-contributions` | 我的贊助 | 必填 |
+
+---
+
+## 活動系統
+
+位於 `src/features/events/`，用於首頁活動區塊顯示。依照 WEB 契約 v1.2.0。
+
+### 活動類型
+
+| 類型 | 說明 | 顏色 |
+|------|------|------|
+| `announcement` | 公告 | 藍色 |
+| `festival` | 節慶 | 橘色 |
+| `limited` | 限時 | 紅色 |
+
+### API 端點
+
+| 端點 | 用途 | 認證 |
+|------|------|------|
+| `GET /api/events` | 活動列表 | 公開 |
+
+支援篩選參數：`type`、`status`、`limit`
+
+### 使用方式
+
+```tsx
+import { EventsSection, getActiveEvents } from '@/features/events';
+
+// 獲取進行中的活動
+const events = await getActiveEvents(3);
+
+// 在頁面中使用
+<EventsSection events={events} />
+```
 
 ---
 
