@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AppDownloadCTA } from "@/components/common/AppDownloadCTA";
-import { EventsSection, getActiveEvents } from "@/features/events";
+// import { EventsSection, getActiveEvents } from "@/features/events";
 import { MapPin, Gift, Compass } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -30,8 +30,8 @@ const features = [
 ];
 
 export default async function HomePage() {
-  // 獲取進行中的活動（最多顯示 3 個）
-  const events = await getActiveEvents(3);
+  // 暫時隱藏活動區塊
+  // const events = await getActiveEvents(3);
 
   return (
     <div className="flex flex-col">
@@ -50,8 +50,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Events Section - 活動區塊 */}
-      <EventsSection events={events} />
+      {/* Events Section - 暫時隱藏 */}
+      {/* <EventsSection events={events} /> */}
 
       {/* Features Section */}
       <section className="py-16 md:py-24">
