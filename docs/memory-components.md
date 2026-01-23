@@ -1,5 +1,15 @@
 # 記憶庫：共用元件
 
+## TL;DR
+
+- **功能**：UI 基礎元件、版面、認證保護、SEO 組件
+- **關鍵檔案**：`src/components/ui/`（shadcn）、`src/components/auth/AuthGuard.tsx`
+- **設計系統**：shadcn/ui + Tailwind CSS，Mobile-first
+- **常用元件**：Button、Card、Dialog、Toast、AuthGuard、SocialLoginButtons
+- **新增元件**：`npx shadcn-ui@latest add [name]`
+
+---
+
 > **跨端對應**
 > - 此為官網專屬記憶庫，無後端對應
 > - 設計系統參考：shadcn/ui

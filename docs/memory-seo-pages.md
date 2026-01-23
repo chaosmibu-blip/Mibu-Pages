@@ -1,5 +1,15 @@
 # 記憶庫：SEO 公開頁面
 
+## TL;DR
+
+- **功能**：城市/景點/行程的 SEO 頁面，讓 Google 索引後引導下載 App
+- **關鍵檔案**：`src/features/seo/`（API、Metadata、JSON-LD）
+- **渲染方式**：SSG + ISR（1hr 重新驗證）
+- **相關 API**：`/api/seo/cities`、`/api/seo/places`、`/api/seo/trips`
+- **頁面路由**：`/explore`、`/city/[slug]`、`/place/[id]`、`/trip/[id]`
+
+---
+
 > **跨端對應**
 > - 後端記憶庫：`docs/memory-web-official.md`
 > - API 契約：`docs/contracts/WEB.md`
