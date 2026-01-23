@@ -1,5 +1,15 @@
 # 記憶庫：商家後台
 
+## TL;DR
+
+- **功能**：商家登入、訂閱購買/管理/退款（iOS 規定跨平台訂閱在官網）
+- **關鍵檔案**：`src/services/api/merchant.ts`、`src/hooks/useAuth.ts`
+- **金流**：Stripe（國際）+ Recur（台灣）雙軌
+- **認證錯誤**：E1006（審核中）、E1007（非商家帳號）
+- **頁面路由**：`/merchant/login`、`/merchant/subscription`、`/merchant/subscribe`
+
+---
+
 > **跨端對應**
 > - 後端記憶庫：`docs/memory-merchant.md`
 > - API 契約：`docs/contracts/WEB.md`（商家 API 區段）

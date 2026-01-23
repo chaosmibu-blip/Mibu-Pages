@@ -1,6 +1,27 @@
 # CLAUDE.md
 
+> **角色定位**：本專案是**契約執行者**，依照後端契約實作官網功能。後端是唯一真相來源，官網不可自行定義 API 或型別。
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
+
+## 快速路由表 🚀
+
+遇到關鍵字時，直接查閱對應文件：
+
+| 關鍵字 | 查閱文件 |
+|--------|----------|
+| 登入、OAuth、認證、E1006、E1007 | `docs/memory-merchant-portal.md` |
+| 訂閱、金流、Stripe、Recur、退款 | `docs/memory-merchant-portal.md` |
+| SEO、城市、景點、行程、Metadata | `docs/memory-seo-pages.md` |
+| 元件、UI、Button、Card、AuthGuard | `docs/memory-components.md` |
+| API 型別、端點格式 | 後端 `docs/contracts/WEB.md` |
+| 錯誤碼、E1xxx~E9xxx | 後端 `docs/contracts/COMMON.md` |
+| 同步指令、待辦任務 | 後端 `docs/sync-web.md` |
+| 已完成任務、回報狀態 | `docs/sync-backend.md` |
+
+---
 
 ## 溝通風格
 
