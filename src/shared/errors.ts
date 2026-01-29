@@ -9,7 +9,7 @@
  * 這樣 Expo 前端可以直接複製使用
  *
  * 同步來源：MIBU_REPLIT/shared/errors.ts
- * 最後同步：2026-01-12
+ * 最後同步：2026-01-29
  */
 
 // ============ Error Code Enum ============
@@ -28,6 +28,8 @@ export enum ErrorCode {
   FORBIDDEN = 'E1011',
   SPECIALIST_REQUIRED = 'E1012',
   ALREADY_REGISTERED = 'E1013',
+  CANNOT_DELETE_ACCOUNT = 'E1014',
+  LAST_LOGIN_METHOD = 'E1015',
 
   // Gacha 扭蛋相關 (E2xxx)
   GACHA_NO_CREDITS = 'E2001',
@@ -51,6 +53,9 @@ export enum ErrorCode {
   COUPON_NOT_FOUND = 'E4006',
   COUPON_EXPIRED = 'E4007',
   COUPON_ALREADY_USED = 'E4008',
+  PLACE_LIMIT_REACHED = 'E4009',
+  COUPON_LIMIT_REACHED = 'E4010',
+  RARITY_NOT_ALLOWED = 'E4011',
 
   // Validation 驗證相關 (E5xxx)
   VALIDATION_ERROR = 'E5001',
@@ -84,11 +89,48 @@ export enum ErrorCode {
   CONVERSATION_NOT_FOUND = 'E6017',
   AD_NOT_FOUND = 'E6018',
   TRANSACTION_NOT_FOUND = 'E6019',
+  REFUND_NOT_FOUND = 'E6020',
+  ROLE_APPLICATION_NOT_FOUND = 'E6021',
 
   // Payment 支付相關 (E7xxx)
   PAYMENT_FAILED = 'E7001',
   SUBSCRIPTION_EXPIRED = 'E7002',
   INSUFFICIENT_BALANCE = 'E7003',
+
+  // Economy 經濟系統相關 (E10xxx)
+  LEVEL_NOT_FOUND = 'E10001',
+  ACHIEVEMENT_NOT_FOUND = 'E10002',
+  ACHIEVEMENT_NOT_UNLOCKED = 'E10003',
+  REWARD_ALREADY_CLAIMED = 'E10004',
+  DAILY_LIMIT_REACHED = 'E10005',
+  DAILY_TASK_NOT_FOUND = 'E10006',
+  DAILY_TASK_ALREADY_COMPLETED = 'E10007',
+  INSUFFICIENT_COINS = 'E10008',
+
+  // Crowdfunding 眾籌系統相關 (E11xxx)
+  CAMPAIGN_NOT_FOUND = 'E11001',
+  CAMPAIGN_NOT_ACTIVE = 'E11002',
+  CAMPAIGN_COMPLETED = 'E11003',
+  INVALID_CONTRIBUTION = 'E11004',
+  IAP_VERIFICATION_FAILED = 'E11005',
+  MINIMUM_AMOUNT_NOT_MET = 'E11006',
+
+  // Referral 推薦系統相關 (E12xxx)
+  REFERRAL_CODE_NOT_FOUND = 'E12001',
+  REFERRAL_CODE_INVALID = 'E12002',
+  REFERRAL_SELF_NOT_ALLOWED = 'E12003',
+  REFERRAL_ALREADY_USED = 'E12004',
+  REFERRAL_INSUFFICIENT_BALANCE = 'E12005',
+  WITHDRAW_MIN_AMOUNT = 'E12006',
+  WITHDRAW_PENDING = 'E12007',
+  BANK_INFO_REQUIRED = 'E12008',
+
+  // Contribution 用戶貢獻相關 (E13xxx)
+  REPORT_DUPLICATE = 'E13001',
+  SUGGESTION_DUPLICATE = 'E13002',
+  VOTE_ALREADY_CAST = 'E13003',
+  VOTE_NOT_ELIGIBLE = 'E13004',
+  CONTRIBUTION_LIMIT_REACHED = 'E13005',
 
   // Server/Config 伺服器相關 (E9xxx)
   SERVER_ERROR = 'E9001',
@@ -101,7 +143,8 @@ export enum ErrorCode {
   TWILIO_NOT_CONFIGURED = 'E9008',
 }
 
-// ============ Error Messages (繁體中文) ============
+// ============ Error Messages (Backend Default) ============
+// 後端預設訊息，前端可選擇使用或覆蓋
 export const ErrorMessages: Record<ErrorCode, string> = {
   // Auth
   [ErrorCode.AUTH_REQUIRED]: '請先登入',
@@ -117,6 +160,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.FORBIDDEN]: '無權限執行此操作',
   [ErrorCode.SPECIALIST_REQUIRED]: '需要專員身份',
   [ErrorCode.ALREADY_REGISTERED]: '已經註冊過',
+  [ErrorCode.CANNOT_DELETE_ACCOUNT]: '無法刪除帳號',
+  [ErrorCode.LAST_LOGIN_METHOD]: '不能移除最後一個登入方式',
 
   // Gacha
   [ErrorCode.GACHA_NO_CREDITS]: '扭蛋次數不足',
@@ -140,6 +185,9 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.COUPON_NOT_FOUND]: '找不到優惠券',
   [ErrorCode.COUPON_EXPIRED]: '優惠券已過期',
   [ErrorCode.COUPON_ALREADY_USED]: '優惠券已使用',
+  [ErrorCode.PLACE_LIMIT_REACHED]: '已達景點認領上限',
+  [ErrorCode.COUPON_LIMIT_REACHED]: '已達優惠券數量上限',
+  [ErrorCode.RARITY_NOT_ALLOWED]: '您的方案不支援此稀有度',
 
   // Validation
   [ErrorCode.VALIDATION_ERROR]: '輸入資料格式錯誤',
@@ -156,7 +204,7 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   // Resource
   [ErrorCode.RESOURCE_NOT_FOUND]: '找不到資源',
   [ErrorCode.USER_NOT_FOUND]: '找不到用戶資料',
-  [ErrorCode.COLLECTION_NOT_FOUND]: '找不到收藏',
+  [ErrorCode.COLLECTION_NOT_FOUND]: '找不到圖鑑',
   [ErrorCode.INVENTORY_ITEM_NOT_FOUND]: '找不到道具',
   [ErrorCode.PLACE_NOT_FOUND]: '找不到景點',
   [ErrorCode.ANNOUNCEMENT_NOT_FOUND]: '找不到公告',
@@ -173,11 +221,48 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.CONVERSATION_NOT_FOUND]: '找不到對話',
   [ErrorCode.AD_NOT_FOUND]: '找不到廣告',
   [ErrorCode.TRANSACTION_NOT_FOUND]: '找不到交易',
+  [ErrorCode.REFUND_NOT_FOUND]: '找不到退款請求',
+  [ErrorCode.ROLE_APPLICATION_NOT_FOUND]: '找不到角色申請',
 
   // Payment
   [ErrorCode.PAYMENT_FAILED]: '付款失敗',
   [ErrorCode.SUBSCRIPTION_EXPIRED]: '訂閱已過期',
   [ErrorCode.INSUFFICIENT_BALANCE]: '餘額不足',
+
+  // Economy 經濟系統
+  [ErrorCode.LEVEL_NOT_FOUND]: '等級資料不存在',
+  [ErrorCode.ACHIEVEMENT_NOT_FOUND]: '成就不存在',
+  [ErrorCode.ACHIEVEMENT_NOT_UNLOCKED]: '成就尚未解鎖',
+  [ErrorCode.REWARD_ALREADY_CLAIMED]: '獎勵已領取',
+  [ErrorCode.DAILY_LIMIT_REACHED]: '已達每日上限',
+  [ErrorCode.DAILY_TASK_NOT_FOUND]: '找不到每日任務',
+  [ErrorCode.DAILY_TASK_ALREADY_COMPLETED]: '此任務今日已完成',
+  [ErrorCode.INSUFFICIENT_COINS]: '金幣不足',
+
+  // Crowdfunding 眾籌系統
+  [ErrorCode.CAMPAIGN_NOT_FOUND]: '募資活動不存在',
+  [ErrorCode.CAMPAIGN_NOT_ACTIVE]: '募資活動未開放',
+  [ErrorCode.CAMPAIGN_COMPLETED]: '募資活動已結束',
+  [ErrorCode.INVALID_CONTRIBUTION]: '無效的貢獻金額',
+  [ErrorCode.IAP_VERIFICATION_FAILED]: 'IAP 驗證失敗',
+  [ErrorCode.MINIMUM_AMOUNT_NOT_MET]: '未達最低贊助金額',
+
+  // Referral 推薦系統
+  [ErrorCode.REFERRAL_CODE_NOT_FOUND]: '推薦碼不存在',
+  [ErrorCode.REFERRAL_CODE_INVALID]: '無效的推薦碼',
+  [ErrorCode.REFERRAL_SELF_NOT_ALLOWED]: '不能推薦自己',
+  [ErrorCode.REFERRAL_ALREADY_USED]: '已使用過推薦碼',
+  [ErrorCode.REFERRAL_INSUFFICIENT_BALANCE]: '餘額不足',
+  [ErrorCode.WITHDRAW_MIN_AMOUNT]: '未達最低提現金額',
+  [ErrorCode.WITHDRAW_PENDING]: '有待處理的提現申請',
+  [ErrorCode.BANK_INFO_REQUIRED]: '需要銀行帳號資訊',
+
+  // Contribution 用戶貢獻
+  [ErrorCode.REPORT_DUPLICATE]: '重複回報',
+  [ErrorCode.SUGGESTION_DUPLICATE]: '重複建議',
+  [ErrorCode.VOTE_ALREADY_CAST]: '已投過票',
+  [ErrorCode.VOTE_NOT_ELIGIBLE]: '無投票資格',
+  [ErrorCode.CONTRIBUTION_LIMIT_REACHED]: '已達每日貢獻上限',
 
   // Server
   [ErrorCode.SERVER_ERROR]: '伺服器錯誤，請稍後再試',
@@ -213,25 +298,22 @@ export function createErrorResponse(
 /**
  * 取得錯誤代碼的預設訊息
  */
-export function getErrorMessage(code: ErrorCode | string): string {
-  if (code in ErrorMessages) {
-    return ErrorMessages[code as ErrorCode];
-  }
-  return '發生未知錯誤';
+export function getErrorMessage(code: ErrorCode): string {
+  return ErrorMessages[code] || '未知錯誤';
 }
 
 /**
  * 檢查錯誤代碼是否為認證相關錯誤
  */
-export function isAuthError(code: ErrorCode | string): boolean {
-  return typeof code === 'string' && code.startsWith('E1');
+export function isAuthError(code: ErrorCode): boolean {
+  return code.startsWith('E1');
 }
 
 /**
  * 檢查錯誤代碼是否為伺服器錯誤
  */
-export function isServerError(code: ErrorCode | string): boolean {
-  return typeof code === 'string' && code.startsWith('E9');
+export function isServerError(code: ErrorCode): boolean {
+  return code.startsWith('E9');
 }
 
 // ============ API Response Types ============

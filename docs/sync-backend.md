@@ -6,6 +6,49 @@
 
 ## 最新回報
 
+### #008 共用型別套件
+
+- **指令來源**: `docs/sync-web.md`
+- **執行時間**: 2026-01-29
+- **狀態**: ✅ 已完成
+
+#### 完成項目
+
+- [x] 從後端複製 `shared/` 資料夾到 `src/shared/`
+- [x] `errors.ts` - 錯誤碼定義（13 大分類，100+ 個錯誤碼）
+- [x] `constants.ts` - 共用常數（七大分類、扭蛋配額、用戶角色等）
+- [x] `response.ts` - API 回應格式規範
+- [x] `id-conventions.ts` - ID 命名規範（解決 placeId/collectionId/itemId 混淆）
+- [x] `api-types.ts` - 所有 API 的 Request/Response 型別
+- [x] `index.ts` - 主入口匯出
+
+#### 新增錯誤碼類別（相較於舊版）
+
+| 類別 | 代碼範圍 | 說明 |
+|------|----------|------|
+| Economy | E10xxx | 經濟系統（等級、成就、每日任務） |
+| Crowdfunding | E11xxx | 眾籌系統 |
+| Referral | E12xxx | 推薦系統 |
+| Contribution | E13xxx | 用戶貢獻 |
+
+#### 使用方式
+
+```typescript
+import {
+  ErrorCode,
+  SEVEN_CATEGORIES,
+  type MibuCategory,
+  API_RESPONSE_FORMAT,
+  isApiError,
+} from '@/shared';
+```
+
+#### 異常回報
+
+無
+
+---
+
 ### #007 六層架構一致性比對
 
 - **指令來源**: `docs/sync-web.md`
@@ -247,6 +290,7 @@
 
 | 日期 | 編號 | 狀態 | 任務 |
 |------|------|------|------|
+| 01-29 | #008 | ✅ | 共用型別套件（`src/shared/` 從後端同步） |
 | 01-19 | #007 | ✅ | 六層架構一致性比對（API 35個、型別 69個、頁面 25個 = 100%） |
 | 01-18 | #006 | ✅ | 活動系統 API 實作 |
 | 01-17 | #005 | ✅ | 商家新增店家頁面 |
