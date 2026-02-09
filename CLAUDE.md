@@ -32,6 +32,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 底線規則 🚫
+
+### 安全底線
+
+| 禁止事項 | 原因 |
+|----------|------|
+| 在程式碼中硬編碼 API keys、tokens | 會被 git 追蹤，造成洩漏 |
+| 繞過 AuthGuard 存取商家頁面 | 破壞認證機制 |
+| 在前端儲存敏感資料（密碼、信用卡） | 前端不安全 |
+| 自行實作 OAuth 流程 | 應使用現有的 Google/Apple SDK |
+
+### 業務底線
+
+| 禁止事項 | 原因 |
+|----------|------|
+| 自行定義 API 型別 | 必須依照後端契約 |
+| 修改金流邏輯（Stripe/Recur） | 影響付款正確性 |
+| 更改退款規則（7 天內） | 涉及消保法規定 |
+| 刪除或修改 SEO metadata 格式 | 影響搜尋排名 |
+
+### 禁止修改的檔案
+
+| 檔案 | 原因 |
+|------|------|
+| `shared/schema.ts` | Drizzle ORM schema，改動影響資料庫 |
+| `.npmrc` | npm 認證設定 |
+| `next.config.ts` | 除非明確需要調整 Next.js 設定 |
+
+---
+
 ## API 契約規則 ⚡
 
 **後端是唯一真相來源**，官網必須依照後端契約實作。
@@ -484,3 +514,117 @@ if (isMerchantError(code)) { /* 商家錯誤 */ }
 | E4009 | PLACE_LIMIT_REACHED | 已達景點數量上限 |
 | E7001 | PAYMENT_FAILED | 付款失敗 |
 | E7002 | SUBSCRIPTION_EXPIRED | 訂閱已過期 |
+
+---
+
+## 常見任務與流程
+
+### 任務類型
+
+| 任務 | 頻率 | 說明 |
+|------|------|------|
+| 串接後端 API | 高 | 依照契約新增/更新 API 呼叫 |
+| 新增頁面 | 中 | 在 `app/` 建立新路由 |
+| 同步後端契約 | 中 | 執行「檢查後端同步清單」 |
+| 修復 bug | 中 | 處理錯誤、UI 問題 |
+| 更新 UI 元件 | 低 | 修改 `src/components/` |
+
+### 標準流程
+
+**串接 API**：
+1. 讀取後端契約確認端點格式
+2. 在 `src/features/*/api/` 新增函數
+3. 在 `src/features/*/types/` 新增型別
+4. 在頁面中使用
+
+**新增頁面**：
+1. 讀取對應記憶庫（SEO/商家）
+2. 在 `app/` 建立資料夾和 `page.tsx`
+3. 決定渲染方式（SSG/CSR）
+4. 如需認證，包裹 `AuthGuard`
+
+**同步後端契約**：
+1. 讀取後端 `docs/sync-web.md`
+2. 執行所有待完成任務
+3. 更新 `docs/sync-backend.md`
+4. Commit + Push
+
+---
+
+## 品質標準
+
+### 驗收標準（什麼叫「做完了」）
+
+- [ ] `npm run check` 通過（無 TypeScript 錯誤）
+- [ ] 頁面響應式（手機、平板、桌面）
+- [ ] API 呼叫依照後端契約
+- [ ] 商家頁面有 AuthGuard 保護
+- [ ] SEO 頁面有正確的 metadata
+
+### 程式碼風格
+
+| 項目 | 規範 |
+|------|------|
+| 語言 | TypeScript（嚴格模式） |
+| 元件 | 函數式元件 + hooks |
+| 樣式 | Tailwind CSS，不用 inline style |
+| 狀態 | 伺服器狀態用 TanStack Query，客戶端狀態用 Zustand |
+| 表單 | React Hook Form + Zod 驗證 |
+
+### 測試標準
+
+目前專案**沒有測試框架**，驗收依賴：
+- TypeScript 型別檢查
+- 手動測試關鍵流程
+
+### Commit 規範
+
+```
+<type>: <簡短描述>
+
+<詳細說明（選填）>
+```
+
+**type 類型**：
+- `feat`: 新功能
+- `fix`: 修復 bug
+- `docs`: 文件更新
+- `refactor`: 重構（不改功能）
+- `style`: 樣式調整
+- `chore`: 雜項（依賴更新等）
+
+**範例**：
+```
+feat: 新增商家優惠券管理頁面
+
+- 新增 /merchant/coupons 路由
+- 串接 GET/POST/DELETE coupon API
+```
+
+---
+
+## 結束前檢查清單
+
+每次任務完成前，確認以下項目：
+
+### 必檢項目
+
+- [ ] `npm run check` 通過
+- [ ] 沒有 console.log 殘留
+- [ ] 沒有硬編碼的測試資料
+- [ ] 敏感資訊沒有進入 git
+
+### 依任務類型
+
+**如果修改了 API 呼叫**：
+- [ ] 型別與後端契約一致
+- [ ] 錯誤處理完整
+
+**如果新增了頁面**：
+- [ ] 更新 CLAUDE.md 專案結構（如有需要）
+- [ ] SEO 頁面有 metadata
+- [ ] 商家頁面有 AuthGuard
+
+**如果是同步任務**：
+- [ ] 更新 `docs/sync-backend.md` 回報狀態
+- [ ] Commit 訊息包含任務編號

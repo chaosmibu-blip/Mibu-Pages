@@ -40,7 +40,7 @@ import {
   type MibuCategory,
   API_RESPONSE_FORMAT,
   isApiError,
-} from '@/shared';
+} from '@chaosmibu-blip/mibu-shared';
 ```
 
 #### 異常回報
