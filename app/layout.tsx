@@ -5,10 +5,12 @@ import { Providers } from "./providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import { CanonicalUrl } from "@/components/seo/CanonicalUrl";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mibu-travel.com"),
   title: {
     default: "Mibu - 旅遊扭蛋",
     template: "%s | Mibu",
@@ -52,6 +54,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <head>
+        <CanonicalUrl />
         <link rel="icon" href="/icon.jpg" />
         <script
           src="https://accounts.google.com/gsi/client"
