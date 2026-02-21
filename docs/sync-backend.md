@@ -6,6 +6,39 @@
 
 ## 最新回報
 
+### #009 活動詳情頁（TDX 觀光活動展示）
+
+- **指令來源**: `docs/sync-web.md`
+- **執行時間**: 2026-02-21
+- **狀態**: ✅ 已完成
+
+#### 完成項目
+
+- [x] 建立 `/events/[id]` 頁面（SSG + ISR，revalidate: 3600）
+- [x] 串接 `GET /api/events/:id` API（`getEventDetail` 函數）
+- [x] 新增 `EventDetail`、`EventDetailResponse` 型別（依照 WEB 契約）
+- [x] SEO metadata（動態 title、description、openGraph）
+- [x] 頁面顯示：活動圖片、標題、日期區間、地點、內容
+- [x] `sourceUrl` 有值時顯示「前往官方網站」外連按鈕
+- [x] 新增 `nationwide` 活動類型（契約定義的全台活動）
+- [x] 更新 `EVENT_TYPE_ICONS` 支援 nationwide 類型
+
+#### 新增/修改檔案
+
+| 檔案 | 變更 |
+|------|------|
+| `app/events/[id]/page.tsx` | 新增 - 活動詳情頁面 |
+| `src/features/events/types/index.ts` | 修改 - 新增 EventDetail、EventDetailResponse、nationwide 類型 |
+| `src/features/events/api/index.ts` | 修改 - 新增 getEventDetail 函數 |
+| `src/features/events/index.ts` | 修改 - 匯出 getEventDetail |
+| `src/features/events/components/EventsSection.tsx` | 修改 - EVENT_TYPE_ICONS 新增 nationwide |
+
+#### 異常回報
+
+- **EventType 差異**：契約定義為 `announcement | nationwide | limited`，但原有程式碼使用 `festival`。已保留 `festival` 兼容，同時新增 `nationwide`。建議後端確認是否需要統一。
+
+---
+
 ### #008 共用型別套件
 
 - **指令來源**: `docs/sync-web.md`
@@ -277,6 +310,7 @@ import {
 
 | 編號 | 日期 | 任務 | 主要產出 |
 |------|------|------|----------|
+| #009 | 02-21 | 活動詳情頁 | `app/events/[id]/`、getEventDetail API |
 | #006 | 01-18 | 活動系統 API | `src/features/events/`、首頁活動區塊 |
 | #005 | 01-17 | 商家新增店家 | `app/merchant/places/new/`、營業時間選擇器 |
 | #004 | 01-17 | CLAUDE.md v2.0 | 募資系統文檔、契約版本更新至 v1.2.0 |
@@ -290,6 +324,7 @@ import {
 
 | 日期 | 編號 | 狀態 | 任務 |
 |------|------|------|------|
+| 02-21 | #009 | ✅ | 活動詳情頁（TDX 觀光活動展示） |
 | 01-29 | #008 | ✅ | 共用型別套件（`src/shared/` 從後端同步） |
 | 01-19 | #007 | ✅ | 六層架構一致性比對（API 35個、型別 69個、頁面 25個 = 100%） |
 | 01-18 | #006 | ✅ | 活動系統 API 實作 |

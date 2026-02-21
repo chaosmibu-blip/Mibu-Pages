@@ -3,8 +3,8 @@
  * 依照 WEB 契約 v1.2.0
  */
 
-// 活動類型
-export type EventType = 'announcement' | 'festival' | 'limited';
+// 活動類型（契約定義：announcement | nationwide | limited）
+export type EventType = 'announcement' | 'festival' | 'nationwide' | 'limited';
 
 // 活動狀態
 export type EventStatus = 'upcoming' | 'active' | 'ended';
@@ -38,6 +38,27 @@ export interface EventsParams {
   limit?: number;
 }
 
+// 活動詳情（依照 WEB 契約 GET /api/events/:id）
+export interface EventDetail {
+  id: number;
+  type: EventType;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  linkUrl: string | null;
+  sourceUrl: string | null;
+  address: string | null;
+  city: string | null;
+  startDate: string;
+  endDate: string | null;
+  priority: number;
+}
+
+// 活動詳情回應
+export interface EventDetailResponse {
+  event: EventDetail;
+}
+
 // 活動類型配置
 export const EVENT_TYPE_CONFIG: Record<EventType, {
   label: string;
@@ -53,6 +74,11 @@ export const EVENT_TYPE_CONFIG: Record<EventType, {
     label: '節慶',
     color: 'text-orange-600',
     bgColor: 'bg-orange-100',
+  },
+  nationwide: {
+    label: '全台活動',
+    color: 'text-green-600',
+    bgColor: 'bg-green-100',
   },
   limited: {
     label: '限時',
