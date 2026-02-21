@@ -4,7 +4,7 @@
  */
 
 import { API_URL } from '@/lib/config';
-import type { Event, EventsResponse, EventsParams } from '../types';
+import type { Event, EventsResponse, EventsParams, EventDetail, EventDetailResponse } from '../types';
 
 // Fallback 資料（當 API 不可用時使用）
 const FALLBACK_EVENTS: Event[] = [
@@ -82,6 +82,25 @@ export async function getEvents(params?: EventsParams): Promise<Event[]> {
  */
 export async function getActiveEvents(limit?: number): Promise<Event[]> {
   return getEvents({ status: 'active', limit });
+}
+
+/**
+ * 取得活動詳情
+ * 依照 WEB 契約：GET /api/events/:id
+ */
+export async function getEventDetail(id: string): Promise<EventDetail | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/events/${id}`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) return null;
+
+    const data: EventDetailResponse = await res.json();
+    return data.event || null;
+  } catch {
+    return null;
+  }
 }
 
 /**

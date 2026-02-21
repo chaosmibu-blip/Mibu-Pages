@@ -14,6 +14,7 @@ interface EventsSectionProps {
 const EVENT_TYPE_ICONS: Record<EventType, typeof Bell> = {
   announcement: Megaphone,
   festival: PartyPopper,
+  nationwide: PartyPopper,
   limited: Zap,
 };
 

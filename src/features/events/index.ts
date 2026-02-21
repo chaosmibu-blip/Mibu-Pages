@@ -7,7 +7,7 @@
 export * from './types';
 
 // API
-export * from './api';
+export { getEvents, getActiveEvents, getEventDetail } from './api';
 
 // 組件
 export { EventsSection } from './components/EventsSection';
