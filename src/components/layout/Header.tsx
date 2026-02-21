@@ -7,8 +7,9 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
+  { href: "/explore", label: "探索城市" },
+  { href: "/trips", label: "行程推薦" },
   { href: "/for-business", label: "商家合作" },
-  { href: "/for-business/pricing", label: "訂閱方案" },
   { href: "/merchant/login", label: "商家登入" },
   { href: "/support", label: "技術支援" },
 ];
