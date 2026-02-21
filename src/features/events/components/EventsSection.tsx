@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Bell, Calendar, Clock, ArrowRight, Megaphone, PartyPopper, Zap } from 'lucide-react';
+import { Bell, Calendar, ArrowRight, Megaphone, PartyPopper, Zap } from 'lucide-react';
 import type { Event, EventType } from '../types';
 import { EVENT_TYPE_CONFIG } from '../types';
+import { NationwideEventsCarousel } from './NationwideEventsCarousel';
 
 interface EventsSectionProps {
   events: Event[];
@@ -94,6 +94,10 @@ export function EventsSection({ events }: EventsSectionProps) {
     return null;
   }
 
+  // 分離全台活動和其他活動
+  const nationwideEvents = events.filter((e) => e.type === 'nationwide');
+  const otherEvents = events.filter((e) => e.type !== 'nationwide');
+
   return (
     <section className="py-12 md:py-16 bg-muted/30">
       <div className="max-w-5xl mx-auto px-6">
@@ -104,11 +108,17 @@ export function EventsSection({ events }: EventsSectionProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {events.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
+        {/* 全台活動輪播 */}
+        <NationwideEventsCarousel events={nationwideEvents} />
+
+        {/* 其他活動卡片 */}
+        {otherEvents.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {otherEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
