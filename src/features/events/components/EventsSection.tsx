@@ -79,15 +79,14 @@ function EventCard({ event }: { event: Event }) {
     </Card>
   );
 
-  if (event.linkUrl) {
-    return (
-      <Link href={event.linkUrl} className="block">
-        {content}
-      </Link>
-    );
-  }
+  // 優先使用 linkUrl，沒有的話導向活動詳情頁
+  const href = event.linkUrl || `/events/${event.id}`;
 
-  return content;
+  return (
+    <Link href={href} className="block">
+      {content}
+    </Link>
+  );
 }
 
 export function EventsSection({ events }: EventsSectionProps) {
