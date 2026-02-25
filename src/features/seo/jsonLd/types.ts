@@ -146,6 +146,23 @@ export interface TouristTrip {
   itinerary?: ItemList;
 }
 
+// ============ 應用程式相關 ============
+
+export interface MobileApplication {
+  '@context': 'https://schema.org';
+  '@type': 'MobileApplication';
+  name: string;
+  operatingSystem: string;
+  applicationCategory: string;
+  description: string;
+  url: string;
+  offers?: {
+    '@type': 'Offer';
+    price: string;
+    priceCurrency: string;
+  };
+}
+
 // ============ 網站相關 ============
 
 export interface WebSite {

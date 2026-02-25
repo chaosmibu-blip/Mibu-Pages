@@ -5,6 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AppDownloadCTA } from "@/components/common/AppDownloadCTA";
 import { EventsSection, getActiveEvents } from "@/features/events";
 import { MapPin, Gift, Compass } from "lucide-react";
+import {
+  generateOrganizationJsonLd,
+  generateWebSiteJsonLd,
+  generateMobileApplicationJsonLd,
+  JsonLdScript,
+} from "@/features/seo";
 
 export const metadata: Metadata = {
   title: "Mibu - 旅遊扭蛋 | 用扭蛋探索世界",
@@ -32,8 +38,14 @@ const features = [
 export default async function HomePage() {
   const events = await getActiveEvents(3);
 
+  const organizationJsonLd = generateOrganizationJsonLd();
+  const webSiteJsonLd = generateWebSiteJsonLd();
+  const mobileAppJsonLd = generateMobileApplicationJsonLd();
+
   return (
     <div className="flex flex-col">
+      <JsonLdScript data={[organizationJsonLd, webSiteJsonLd, mobileAppJsonLd]} />
+
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-primary/10 via-background to-accent/20">
         <div className="max-w-5xl mx-auto px-6 text-center">

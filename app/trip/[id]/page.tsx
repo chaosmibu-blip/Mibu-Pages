@@ -4,84 +4,29 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Route, ChevronRight, Star, ArrowRight, ArrowDown, Download } from "lucide-react";
-import { API_URL } from "@/lib/config";
+import { MapPin, Route, Star, ArrowRight, ArrowDown } from "lucide-react";
+import {
+  getTrips,
+  getTripDetail,
+  getRelatedTrips,
+  generateTripMetadata,
+  generateTripJsonLd,
+  tripDetailBreadcrumb,
+  SeoPageHeader,
+  JsonLdScript,
+  type TripPlace,
+  type TripSummary,
+} from "@/features/seo";
 
 export const revalidate = 3600;
-
-interface Place {
-  id: number;
-  name: string;
-  slug: string;
-  category: string;
-  subcategory: string;
-  address: string;
-  description: string;
-  rating: number;
-  imageUrl: string;
-  location: { lat: number; lng: number };
-}
-
-interface Trip {
-  id: number;
-  title: string;
-  city: string;
-  district: string;
-  description: string;
-  placeCount: number;
-  publishedAt: string;
-}
-
-interface TripDetail {
-  trip: Trip;
-  places: Place[];
-}
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-// 動態產生行程詳情頁面的靜態參數
 export async function generateStaticParams() {
-  try {
-    const res = await fetch(`${API_URL}/api/seo/trips`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    const trips: Trip[] = Array.isArray(data) ? data : (data.trips || []);
-
-    return trips.map((trip) => ({ id: String(trip.id) }));
-  } catch {
-    return [];
-  }
-}
-
-async function getTripDetail(id: string): Promise<TripDetail | null> {
-  try {
-    const res = await fetch(`${API_URL}/api/seo/trips/${id}`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
-async function getRelatedTrips(city: string, district: string, currentId: string): Promise<Trip[]> {
-  try {
-    const res = await fetch(
-      `${API_URL}/api/seo/trips?city=${encodeURIComponent(city)}&district=${encodeURIComponent(district)}`,
-      { next: { revalidate: 3600 } }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    const trips = Array.isArray(data) ? data : (data.trips || []);
-    return trips.filter((t: Trip) => t.id.toString() !== currentId).slice(0, 3);
-  } catch {
-    return [];
-  }
+  const trips = await getTrips();
+  return trips.map((trip) => ({ id: String(trip.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -90,13 +35,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) {
     return { title: "行程詳情 | Mibu" };
   }
-  return {
-    title: `${data.trip.title} | Mibu`,
-    description: data.trip.description,
-  };
+  return generateTripMetadata(data.trip);
 }
 
-function PlaceCard({ place, index }: { place: Place; index: number }) {
+function PlaceCard({ place, index }: { place: TripPlace; index: number }) {
   return (
     <Card className="min-w-[280px] md:min-w-[300px] flex-shrink-0 overflow-hidden" data-testid={`card-place-${place.id}`}>
       <div className="aspect-[4/3] relative">
@@ -149,45 +91,29 @@ export default async function TripDetailPage({ params }: Props) {
   }
 
   const { trip, places } = data;
-  const relatedTrips = await getRelatedTrips(trip.city, trip.district, id);
+  const relatedTripsRes = await getRelatedTrips(id);
+  const relatedTrips: TripSummary[] = relatedTripsRes?.relatedTrips || [];
+
+  const breadcrumbItems = tripDetailBreadcrumb(
+    trip.city,
+    trip.district || trip.city,
+    trip.title
+  );
+  const tripJsonLd = generateTripJsonLd(data);
 
   return (
     <div className="flex flex-col">
-      <section className="bg-primary/5 py-8 md:py-12">
-        <div className="max-w-5xl mx-auto px-6">
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
-            <Link href="/" className="hover:text-foreground">首頁</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href={`/trips/${encodeURIComponent(trip.city)}`} className="hover:text-foreground">
-              {trip.city}
-            </Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link
-              href={`/trips/${encodeURIComponent(trip.city)}/${encodeURIComponent(trip.district)}`}
-              className="hover:text-foreground"
-            >
-              {trip.district}
-            </Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="text-foreground">本行程</span>
-          </nav>
+      <JsonLdScript data={tripJsonLd} />
 
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            {trip.title}
-          </h1>
-          <p className="text-muted-foreground">
-            {trip.placeCount} 個景點
-          </p>
-        </div>
-      </section>
+      <SeoPageHeader
+        breadcrumbItems={breadcrumbItems}
+        title={trip.title}
+        subtitle={trip.description}
+        badge={<Badge variant="secondary">{trip.placeCount} 個景點</Badge>}
+      />
 
       <section className="py-8 md:py-12">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-muted/50 rounded-lg p-6 mb-8">
-            <h2 className="font-semibold mb-2">行程簡介</h2>
-            <p className="text-muted-foreground">{trip.description}</p>
-          </div>
-
           <div className="hidden md:flex items-center gap-4 overflow-x-auto pb-4">
             {places.map((place, index) => (
               <PlaceCard key={place.id} place={place} index={index} />

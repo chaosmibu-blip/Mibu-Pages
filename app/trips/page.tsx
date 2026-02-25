@@ -1,45 +1,29 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { MapPin, Route } from "lucide-react";
-import { API_URL } from "@/lib/config";
+import {
+  generateTripsMetadata,
+  generateTripListJsonLd,
+  getTrips,
+  tripsBreadcrumb,
+  SeoPageHeader,
+  JsonLdScript,
+  type Trip,
+} from "@/features/seo";
 
-export const metadata: Metadata = {
-  title: "探索行程 | Mibu",
-  description: "探索精選旅遊行程，發現各地最棒的一日遊、多日遊行程規劃。",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return generateTripsMetadata();
+}
 
 export const revalidate = 3600;
 
-interface Trip {
-  id: number;
-  title: string;
-  city: string;
-  district: string;
-  description: string;
-  placeCount: number;
-}
-
-interface City {
+interface CityGroup {
   name: string;
   tripCount: number;
 }
 
-async function getTrips(): Promise<Trip[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/seo/trips`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : (data.trips || []);
-  } catch {
-    return [];
-  }
-}
-
-function groupTripsByCity(trips: Trip[]): City[] {
+function groupTripsByCity(trips: Trip[]): CityGroup[] {
   const cityMap = new Map<string, number>();
   trips.forEach((trip) => {
     cityMap.set(trip.city, (cityMap.get(trip.city) || 0) + 1);
@@ -54,18 +38,18 @@ export default async function TripsPage() {
   const trips = await getTrips();
   const cities = groupTripsByCity(trips);
 
+  const breadcrumbItems = tripsBreadcrumb();
+  const tripsJsonLd = generateTripListJsonLd(trips, '精選旅遊行程', '探索各城市的精選旅遊行程規劃');
+
   return (
     <div className="flex flex-col">
-      <section className="bg-primary/5 py-12 md:py-16">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            探索行程
-          </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            發現精選旅遊行程，開始規劃您的下一趟旅程。
-          </p>
-        </div>
-      </section>
+      <JsonLdScript data={tripsJsonLd} />
+
+      <SeoPageHeader
+        breadcrumbItems={breadcrumbItems}
+        title="探索行程"
+        subtitle="發現精選旅遊行程，開始規劃您的下一趟旅程。"
+      />
 
       <section className="py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-6">

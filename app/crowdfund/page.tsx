@@ -7,6 +7,7 @@ import { AppDownloadCTA } from "@/components/common/AppDownloadCTA";
 import { Globe, Users, Target, TrendingUp } from "lucide-react";
 import { API_URL } from "@/lib/config";
 import type { CrowdfundCampaign, CampaignsResponse } from "@/features/crowdfund";
+import { Breadcrumb } from "@/features/seo";
 
 export const metadata: Metadata = {
   title: "募資活動 | Mibu 旅遊扭蛋",
@@ -108,6 +109,13 @@ export default async function CrowdfundPage() {
       {/* Hero Section */}
       <section className="py-12 md:py-16 bg-gradient-to-b from-primary/5 to-background">
         <div className="max-w-5xl mx-auto px-6 text-center">
+          <Breadcrumb
+            items={[
+              { label: "首頁", href: "/" },
+              { label: "募資活動" },
+            ]}
+            className="justify-center mb-4"
+          />
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium mb-4">
             <Target className="h-4 w-4" />
             群眾募資

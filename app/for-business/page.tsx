@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, TrendingUp, Users, ArrowRight, CheckCircle, Zap } from "lucide-react";
+import { TrendingUp, Users, ArrowRight, CheckCircle, Zap } from "lucide-react";
+import { generateOrganizationJsonLd, JsonLdScript } from "@/features/seo";
 
 export const metadata: Metadata = {
   title: "商家合作 | Mibu 旅遊扭蛋",
@@ -36,8 +37,12 @@ const features = [
 ];
 
 export default function ForBusinessPage() {
+  const orgJsonLd = generateOrganizationJsonLd();
+
   return (
     <div className="flex flex-col">
+      <JsonLdScript data={orgJsonLd} />
+
       <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-background to-accent/20">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6">

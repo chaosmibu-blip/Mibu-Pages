@@ -8,7 +8,7 @@
 export * from './types';
 
 // 組織和網站
-export { generateOrganizationJsonLd, generateWebSiteJsonLd } from './organization';
+export { generateOrganizationJsonLd, generateWebSiteJsonLd, generateMobileApplicationJsonLd } from './organization';
 
 // 麵包屑
 export {

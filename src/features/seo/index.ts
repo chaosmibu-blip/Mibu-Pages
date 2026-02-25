@@ -47,6 +47,7 @@ export {
   // 組織和網站
   generateOrganizationJsonLd,
   generateWebSiteJsonLd,
+  generateMobileApplicationJsonLd,
   // 麵包屑
   generateBreadcrumbJsonLd,
   cityBreadcrumb,

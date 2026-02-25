@@ -89,6 +89,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 「審計架構一致性」 | 比對官網與後端的 API 差異 |
 | 「同步專案記憶」 | 更新 CLAUDE.md 確保與現況一致 |
 | 「檢查後端同步清單」 | 讀取 `docs/sync-web.md` 執行同步指令 |
+| 「寫計畫」 | 進入 Plan Mode，針對當前任務寫完整計畫文件後再執行 |
+| 「SEO 演進檢查」 | 檢查後端/App 新功能，同步更新官網結構化資料（見下方 SEO 演進流程） |
 
 ---
 
@@ -337,6 +339,7 @@ BASE_URL=網站基礎 URL（預設 https://mibu-travel.com）
 - 所有頁面需響應式（手機優先）
 - SEO 頁面使用 SSG + ISR
 - 商家頁面需認證保護
+- **執行較大型的計畫前，先寫好完整的計畫文件**（涉及 3 個以上檔案的修改，一律先進入 Plan Mode 寫計畫、經審核後再動手）
 
 ---
 
@@ -628,3 +631,85 @@ feat: 新增商家優惠券管理頁面
 **如果是同步任務**：
 - [ ] 更新 `docs/sync-backend.md` 回報狀態
 - [ ] Commit 訊息包含任務編號
+
+---
+
+## 專案認知獲取方法
+
+新對話開始時，Claude 應透過以下步驟快速建立對 Mibu 專案的認知：
+
+### 1. 讀取核心文件（必做）
+
+| 文件 | 目的 |
+|------|------|
+| `CLAUDE.md`（本文件） | 專案全貌、規範、路由表 |
+| `docs/memory-seo-pages.md` | SEO 頁面的實作狀態 |
+| `docs/memory-merchant-portal.md` | 商家功能的實作狀態 |
+| `docs/memory-components.md` | 共用元件的使用方式 |
+
+### 2. 了解三端架構
+
+- **後端（MIBU_REPLIT）**：API + 資料庫 + 契約制定
+- **App（mibu-app）**：扭蛋核心、行程規劃、收藏
+- **官網（Mibu-Pages，本專案）**：SEO、商家訂閱、募資
+
+### 3. 了解產品定位
+
+Mibu 是**旅遊扭蛋 App**：用戶透過扭蛋機制隨機發現旅遊景點。官網負責：
+- 讓 Google/AI 爬蟲找到 Mibu 的內容（程式化 SEO）
+- 商家跨平台訂閱（iOS 規定必須在官網完成）
+- 群眾募資開拓新國家
+
+### 4. 查看後端契約（需要時）
+
+如果任務涉及 API 串接，讀取後端 `docs/contracts/WEB.md` 和 `COMMON.md`。
+
+---
+
+## SEO 演進流程（Skill：「SEO 演進檢查」）
+
+收到「SEO 演進檢查」指令時，執行以下步驟：
+
+### Step 1：檢查後端新端點
+
+1. 讀取後端 `docs/contracts/WEB.md`
+2. 比對 `src/features/seo/api/` 中已串接的端點
+3. 找出新增但官網尚未串接的 API
+
+### Step 2：檢查結構化資料覆蓋率
+
+1. 掃描所有 `app/` 下的 `page.tsx` 檔案
+2. 檢查每個頁面是否有 `<JsonLdScript>` 元件
+3. 檢查每個 SEO 頁面是否使用 SEO 模組的 metadata generator
+4. 列出缺少結構化資料的頁面
+
+### Step 3：檢查 JSON-LD 產生器利用率
+
+1. 列出 `src/features/seo/jsonLd/` 中所有 generator
+2. 搜尋哪些 generator 實際被 `app/` 頁面使用
+3. 回報未使用的 generator 和建議
+
+### Step 4：檢查 Schema.org 新需求
+
+1. 根據後端新功能（新實體類型），判斷是否需要新的 JSON-LD generator
+2. 例如：後端新增優惠券 API → 可能需要 `Offer` schema
+3. 例如：後端新增活動詳情 → 可能需要 `Event` schema
+
+### Step 5：輸出報告
+
+產出以下表格：
+
+| 項目 | 狀態 | 建議 |
+|------|------|------|
+| 新 API 端點 | 列出 | 是否需要新 SEO 頁面 |
+| 缺少 JSON-LD 的頁面 | 列出 | 需要加入哪個 generator |
+| 未使用的 generator | 列出 | 可在哪個頁面使用 |
+| 需要新建的 generator | 列出 | 對應的 Schema.org 類型 |
+
+### 黃金標準參考
+
+所有 SEO 頁面應遵循 `app/trips/[city]/page.tsx` 的模式：
+1. 從 `@/features/seo` import metadata generator + JSON-LD generator + 元件
+2. `generateMetadata()` 用 SEO 模組的 generator
+3. 頁面頂部放 `<JsonLdScript data={...} />`
+4. 用 `<SeoPageHeader>` 或 `<Breadcrumb>` 提供結構化導覽
