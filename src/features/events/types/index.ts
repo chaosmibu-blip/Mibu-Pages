@@ -18,6 +18,7 @@ export interface Event {
   imageUrl?: string;
   linkUrl?: string;
   linkText?: string;
+  city?: string;
   startDate: string;
   endDate?: string;
   status: EventStatus;
