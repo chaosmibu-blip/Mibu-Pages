@@ -64,25 +64,30 @@ export const EVENT_TYPE_CONFIG: Record<EventType, {
   label: string;
   color: string;
   bgColor: string;
+  borderColor: string;
 }> = {
   announcement: {
     label: '公告',
     color: 'text-blue-600',
     bgColor: 'bg-blue-100',
+    borderColor: 'border-l-blue-500',
   },
   festival: {
     label: '節慶',
     color: 'text-orange-600',
     bgColor: 'bg-orange-100',
+    borderColor: 'border-l-orange-500',
   },
   nationwide: {
     label: '全台活動',
     color: 'text-green-600',
     bgColor: 'bg-green-100',
+    borderColor: 'border-l-green-500',
   },
   limited: {
     label: '限時',
     color: 'text-red-600',
     bgColor: 'bg-red-100',
+    borderColor: 'border-l-red-500',
   },
 };

@@ -36,55 +36,47 @@ function formatDateRange(startDate: string, endDate?: string): string {
 function EventCard({ event }: { event: Event }) {
   const typeConfig = EVENT_TYPE_CONFIG[event.type];
   const Icon = EVENT_TYPE_ICONS[event.type];
-
-  const content = (
-    <Card className="group cursor-pointer transition-all hover:shadow-md h-full">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg ${typeConfig.bgColor} shrink-0`}>
-            <Icon className={`h-5 w-5 ${typeConfig.color}`} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="secondary" className={`${typeConfig.bgColor} ${typeConfig.color} text-xs`}>
-                {typeConfig.label}
-              </Badge>
-              {event.status === 'upcoming' && (
-                <Badge variant="outline" className="text-xs">
-                  即將開始
-                </Badge>
-              )}
-            </div>
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-              {event.title}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {event.description}
-            </p>
-            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {formatDateRange(event.startDate, event.endDate)}
-              </span>
-              {event.linkText && (
-                <span className="flex items-center gap-1 text-primary font-medium">
-                  {event.linkText}
-                  <ArrowRight className="h-3 w-3" />
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  // 優先使用 linkUrl，沒有的話導向活動詳情頁
   const href = event.linkUrl || `/events/${event.id}`;
 
   return (
     <Link href={href} className="block">
-      {content}
+      <Card className={`group cursor-pointer transition-all hover:shadow-md h-full border-l-4 ${typeConfig.borderColor}`}>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`p-1.5 rounded-md ${typeConfig.bgColor} shrink-0`}>
+              <Icon className={`h-4 w-4 ${typeConfig.color}`} />
+            </div>
+            <Badge variant="secondary" className={`${typeConfig.bgColor} ${typeConfig.color} text-xs`}>
+              {typeConfig.label}
+            </Badge>
+            {event.status === 'upcoming' && (
+              <Badge variant="outline" className="text-xs">
+                即將開始
+              </Badge>
+            )}
+          </div>
+          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-1">
+            {event.title}
+          </h3>
+          {event.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+              {event.description}
+            </p>
+          )}
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {formatDateRange(event.startDate, event.endDate)}
+            </span>
+            {event.linkText && (
+              <span className="flex items-center gap-1 text-primary font-medium group-hover:translate-x-0.5 transition-transform">
+                {event.linkText}
+                <ArrowRight className="h-3 w-3" />
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </Link>
   );
 }
@@ -113,7 +105,7 @@ export function EventsSection({ events }: EventsSectionProps) {
 
         {/* 其他活動卡片 */}
         {otherEvents.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {otherEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
