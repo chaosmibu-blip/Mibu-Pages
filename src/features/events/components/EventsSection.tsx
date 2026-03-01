@@ -36,7 +36,7 @@ function formatDateRange(startDate: string, endDate?: string): string {
 function EventCard({ event }: { event: Event }) {
   const typeConfig = EVENT_TYPE_CONFIG[event.type];
   const Icon = EVENT_TYPE_ICONS[event.type];
-  const href = event.linkUrl || `/events/${event.id}`;
+  const href = `/events/${event.id}`;
 
   return (
     <Link href={href} className="block">

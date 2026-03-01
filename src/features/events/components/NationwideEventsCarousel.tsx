@@ -102,7 +102,7 @@ export function NationwideEventsCarousel({ events }: NationwideEventsCarouselPro
       <div ref={emblaRef} className="overflow-hidden rounded-xl">
         <div className="flex -ml-4">
           {events.map((event) => {
-            const href = event.linkUrl || `/events/${event.id}`;
+            const href = `/events/${event.id}`;
             return (
               <div
                 key={event.id}
